@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Dofus Quest Linker",
+  "version": "2.0",
+  "description": "Adds a button on any Dofus Wiki page to open the corresponding DofusPourLesNoobs page with French names for quests, items, monsters, areas, and dungeons.",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.dofusdb.fr/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://dofuswiki.fandom.com/wiki/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "96": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Dofus Quest Linker"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "dofus-quest-linker@example.com",
+      "strict_min_version": "109.0"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["dofuspourlenoobs.png"],
+      "matches": ["*://dofuswiki.fandom.com/*"]
+    }
+  ]
+}
