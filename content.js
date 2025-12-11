@@ -57,7 +57,7 @@
             cursor: pointer;
             font-family: 'Trebuchet MS', Arial, sans-serif;
             transition: all 0.3s ease;
-            max-width: 200px;
+            max-width: 240px;
         `;
         
         // Create logo and text container
@@ -70,24 +70,30 @@
         
         // Add logo
         const logo = document.createElement("img");
-        logo.src = browserAPI.runtime.getURL("dofuspourlenoobs.png");
+        logo.src = browserAPI.runtime.getURL("dofusquestimg.png");
         logo.alt = "DofusPourLesNoobs";
         logo.style.cssText = `
-            width: 24px;
-            height: 24px;
+            width: 52px;
+            height: 52px;
             border-radius: 4px;
         `;
         
         // Add text
         const text = document.createElement("div");
-        text.innerHTML = `
-            <div style="color: #d4af37; font-size: 11px; font-weight: bold; margin-bottom: 2px;">
-                DOFUS POUR LES NOOBS
-            </div>
-            <div style="color: #ffffff; font-size: 12px; opacity: 0.9;">
-                ${isDirectLink ? 'Try Direct Link' : 'Open Guide'}
-            </div>
-        `;
+        
+        // Create title element
+        const title = document.createElement("div");
+        title.style.cssText = "color: #d4af37; font-size: 11px; font-weight: bold; margin-bottom: 2px;";
+        title.textContent = "DOFUS POUR LES NOOBS";
+        
+        // Create subtitle element
+        const subtitle = document.createElement("div");
+        subtitle.style.cssText = "color: #ffffff; font-size: 12px; opacity: 0.9;";
+        subtitle.textContent = isDirectLink ? 'Try Direct Link' : 'Open Guide';
+        
+        // Append elements
+        text.appendChild(title);
+        text.appendChild(subtitle);
         
         content.appendChild(logo);
         content.appendChild(text);
