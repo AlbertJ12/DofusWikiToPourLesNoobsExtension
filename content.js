@@ -15,14 +15,108 @@
                        !pageContent.includes("forum:") &&
                        !pageContent.includes("user:") &&
                        !pageContent.includes("help:") &&
-                       !pageContent.includes("template:") &&
-                       englishName.length > 2 &&
                        !englishName.includes("Fandom") &&
                        !englishName.includes("Wiki");
+
+    // Check if popup is visible before running
+    function checkPopupVisible() {
+        browserAPI.storage.sync.get(['popupVisible'], function(result) {
+            // Default to false (disabled) if not set
+            const isVisible = result.popupVisible === true;
+            
+            if (isVisible && isValidPage) {
+                console.log("Popup visible, running on valid page");
+                findContentName();
+            } else {
+                console.log("Popup hidden or not on valid page");
+                // Remove existing button if any
+                const existingBtn = document.getElementById("dofus-quest-linker-btn");
+                if (existingBtn) existingBtn.remove();
+            }
+        });
+    }
+
+    // Listen for popup visibility changes from background script
+    browserAPI.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        if (message.type === 'popupVisibilityChanged') {
+            console.log("Popup visibility changed to:", message.visible);
+            if (message.visible && isValidPage) {
+                findContentName();
+            } else {
+                // Remove button when hidden
+                const existingBtn = document.getElementById("dofus-quest-linker-btn");
+                if (existingBtn) existingBtn.remove();
+            }
+        }
+    });
+
+    // Listen for storage changes (in case popup visibility is changed from another tab)
+    browserAPI.storage.onChanged.addListener(function(changes, namespace) {
+        if (namespace === 'sync' && changes.popupVisible) {
+            console.log("Popup visibility state changed:", changes.popupVisible.newValue);
+            if (changes.popupVisible.newValue && isValidPage) {
+                findContentName();
+            } else {
+                // Remove button when hidden
+                const existingBtn = document.getElementById("dofus-quest-linker-btn");
+                if (existingBtn) existingBtn.remove();
+            }
+        }
+    });
     
-    if (!isValidPage) {
-        console.log("Not a valid content page, skipping");
-        return;
+    // Main execution
+    checkPopupVisible();
+
+    function findContentName() {
+        // Try API with multiple content types, then fallback to direct URL generation
+        browserAPI.runtime.sendMessage({ type: "fetchAllContent", name: englishName }, (resp) => {
+            if (browserAPI.runtime.lastError) {
+                console.error("Runtime error:", browserAPI.runtime.lastError);
+                // Fallback to direct URL generation
+                createFallbackButton();
+                return;
+            }
+            
+            if (resp && resp.success && resp.data) {
+                // Try to find French name from any content type
+                let frenchName = null;
+                
+                // Check quests
+                if (resp.data.quests && resp.data.quests.data && resp.data.quests.data.length > 0) {
+                    frenchName = resp.data.quests.data[0].name && resp.data.quests.data[0].name.fr;
+                }
+                // Check items
+                else if (resp.data.items && resp.data.items.data && resp.data.items.data.length > 0) {
+                    frenchName = resp.data.items.data[0].name && resp.data.items.data[0].name.fr;
+                }
+                // Check monsters
+                else if (resp.data.monsters && resp.data.monsters.data && resp.data.monsters.data.length > 0) {
+                    frenchName = resp.data.monsters.data[0].name && resp.data.monsters.data[0].name.fr;
+                }
+                // Check subareas
+                else if (resp.data.subareas && resp.data.subareas.data && resp.data.subareas.data.length > 0) {
+                    frenchName = resp.data.subareas.data[0].name && resp.data.subareas.data[0].name.fr;
+                }
+                // Check areas
+                else if (resp.data.areas && resp.data.areas.data && resp.data.areas.data.length > 0) {
+                    frenchName = resp.data.areas.data[0].name && resp.data.areas.data[0].name.fr;
+                }
+                // Check dungeons
+                else if (resp.data.dungeons && resp.data.dungeons.data && resp.data.dungeons.data.length > 0) {
+                    frenchName = resp.data.dungeons.data[0].name && resp.data.dungeons.data[0].name.fr;
+                }
+                
+                if (frenchName) {
+                    const slug = toSlug(frenchName);
+                    const dplnUrl = "https://www.dofuspourlesnoobs.com/" + slug + ".html";
+                    createButton(dplnUrl, false);
+                    return;
+                }
+            }
+            
+            console.log("API failed or no French name found in any content type, using fallback");
+            createFallbackButton();
+        });
     }
 
     function toSlug(text) {
@@ -30,20 +124,29 @@
             .toLowerCase()
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
-            .replace(/['']/g, "")
-            .replace(/[^a-z0-9\s]+/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/^-+|-+$/g, "");
+            .replace(/['']/g, " ")                    // Replace apostrophes with spaces
+            .replace(/[^a-z0-9\s-]+/g, "")            // Keep hyphens, remove other special chars
+            .replace(/\s+/g, "-")                     // Spaces to hyphens
+            .replace(/-+/g, "-")                      // Multiple hyphens to single
+            .replace(/^-+|-+$/g, "");                 // Remove leading/trailing hyphens
     }
 
     function createButton(dplnUrl, isDirectLink = false) {
-        // Remove existing button if any
-        const existingBtn = document.getElementById("dofus-quest-linker-btn");
-        if (existingBtn) existingBtn.remove();
-        
-        // Create a styled container with logo
-        const container = document.createElement("div");
-        container.id = "dofus-quest-linker-btn";
+        // Check current popup visibility state before creating button
+        browserAPI.storage.sync.get(['popupVisible'], function(result) {
+            const isVisible = result.popupVisible === true;
+            
+            if (!isVisible) {
+                console.log("Extension disabled, not creating button");
+                return;
+            }
+            
+            const existingBtn = document.getElementById("dofus-quest-linker-btn");
+            if (existingBtn) existingBtn.remove();
+            
+            // Create container with correct original styling
+            const container = document.createElement("div");
+            container.id = "dofus-quest-linker-btn";
         container.style.cssText = `
             position: fixed;
             top: 20px;
@@ -67,17 +170,17 @@
             align-items: center;
             gap: 8px;
         `;
-        
+            
         // Add logo
-        const logo = document.createElement("img");
+            const logo = document.createElement("img");
         logo.src = browserAPI.runtime.getURL("dofusquestimg.png");
-        logo.alt = "DofusPourLesNoobs";
+            logo.alt = "DofusPourLesNoobs";
         logo.style.cssText = `
             width: 52px;
             height: 52px;
             border-radius: 4px;
         `;
-        
+            
         // Add text
         const text = document.createElement("div");
         
@@ -90,7 +193,7 @@
         const subtitle = document.createElement("div");
         subtitle.style.cssText = "color: #ffffff; font-size: 12px; opacity: 0.9;";
         subtitle.textContent = isDirectLink ? 'Try Direct Link' : 'Open Guide';
-        
+            
         // Append elements
         text.appendChild(title);
         text.appendChild(subtitle);
@@ -100,22 +203,25 @@
         container.appendChild(content);
         
         // Hover effects
-        container.onmouseover = () => {
+            container.onmouseover = () => {
             container.style.transform = 'translateY(-2px)';
             container.style.boxShadow = '0 6px 16px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.4)';
             container.style.borderColor = '#ffd700';
-        };
-        
-        container.onmouseout = () => {
+            };
+            
+            container.onmouseout = () => {
             container.style.transform = 'translateY(0)';
             container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2)';
             container.style.borderColor = '#d4af37';
-        };
-        
-        container.onclick = () => window.open(dplnUrl, "_blank");
-        
-        document.body.appendChild(container);
-        console.log("Styled button created for URL:", dplnUrl);
+            };
+            
+            // Add click handler
+            container.onclick = () => window.open(dplnUrl, "_blank");
+            
+            // Add to page
+            document.body.appendChild(container);
+            console.log("Styled button created for URL:", dplnUrl);
+        });
     }
 
     // Try API with multiple content types, then fallback to direct URL generation
@@ -155,6 +261,18 @@
             else if (resp.data.dungeons && resp.data.dungeons.data && resp.data.dungeons.data.length > 0) {
                 frenchName = resp.data.dungeons.data[0].name && resp.data.dungeons.data[0].name.fr;
             }
+            // Check achievements
+            else if (resp.data.achievements && resp.data.achievements.data && resp.data.achievements.data.length > 0) {
+                frenchName = resp.data.achievements.data[0].name && resp.data.achievements.data[0].name.fr;
+            }
+            // Check equipments
+            else if (resp.data.equipments && resp.data.equipments.data && resp.data.equipments.data.length > 0) {
+                frenchName = resp.data.equipments.data[0].name && resp.data.equipments.data[0].name.fr;
+            }
+            // Check spells
+            else if (resp.data.spells && resp.data.spells.data && resp.data.spells.data.length > 0) {
+                frenchName = resp.data.spells.data[0].name && resp.data.spells.data[0].name.fr;
+            }
             
             if (frenchName) {
                 const slug = toSlug(frenchName);
@@ -174,4 +292,7 @@
         const dplnUrl = "https://www.dofuspourlesnoobs.com/" + slug + ".html";
         createButton(dplnUrl, true);
     }
+    
+    // Main execution
+    checkPopupVisible();
 })();
