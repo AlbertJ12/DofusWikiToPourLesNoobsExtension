@@ -399,6 +399,12 @@ Create a simple privacy policy page explaining:
 
 ## Version History
 
+- **v1.8**: Added extension icon visual toggle - shows enabled/disabled state, click to toggle popup visibility
+- **v1.7**: Added popup visibility toggle - popup visible by default, click extension icon to hide/show
+- **v1.6**: Added extension icon toggle functionality - default enabled, click icon to toggle on/off
+- **v1.5**: Removed toggle functionality completely - reverted to simple button design as requested
+- **v1.4**: Moved toggle on/off feature from popup to the extension button itself for better accessibility
+- **v1.3**: Added toggle on/off feature in popup with storage persistence (default: on)
 - **v2.11**: Fixed Firefox manifest structure - removed unsupported data_collection_properties and separated Android settings
 - **v2.10**: Security fix - Replaced unsafe innerHTML assignment with safe DOM manipulation methods for Firefox compliance
 - **v2.9**: Fixed required array to use official Firefox 'websiteContent' key based on MDN documentation

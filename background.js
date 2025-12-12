@@ -11,13 +11,16 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                 const encodedName = encodeURIComponent(msg.name);
                 
                 // Try multiple content types in parallel
-                const [quests, items, monsters, subareas, areas, dungeons] = await Promise.allSettled([
+                const [quests, items, monsters, subareas, areas, dungeons, achievements, equipments, spells] = await Promise.allSettled([
                     fetch("https://api.dofusdb.fr/quests?name.en=" + encodedName),
                     fetch("https://api.dofusdb.fr/items?name.en=" + encodedName),
                     fetch("https://api.dofusdb.fr/monsters?name.en=" + encodedName),
                     fetch("https://api.dofusdb.fr/subareas?name.en=" + encodedName),
                     fetch("https://api.dofusdb.fr/areas?name.en=" + encodedName),
-                    fetch("https://api.dofusdb.fr/dungeons?name.en=" + encodedName)
+                    fetch("https://api.dofusdb.fr/dungeons?name.en=" + encodedName),
+                    fetch("https://api.dofusdb.fr/achievements?name.en=" + encodedName),
+                    fetch("https://api.dofusdb.fr/equipments?name.en=" + encodedName),
+                    fetch("https://api.dofusdb.fr/spells?name.en=" + encodedName)
                 ]);
                 
                 const results = {};
@@ -71,6 +74,30 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
                     }
                 }
                 
+                if (achievements.status === 'fulfilled') {
+                    const achievementData = await achievements.value.json();
+                    if (achievementData.data && achievementData.data.length > 0) {
+                        results.achievements = achievementData;
+                        console.log("Found achievement:", achievementData.data[0].name);
+                    }
+                }
+                
+                if (equipments.status === 'fulfilled') {
+                    const equipmentData = await equipments.value.json();
+                    if (equipmentData.data && equipmentData.data.length > 0) {
+                        results.equipments = equipmentData;
+                        console.log("Found equipment:", equipmentData.data[0].name);
+                    }
+                }
+                
+                if (spells.status === 'fulfilled') {
+                    const spellData = await spells.value.json();
+                    if (spellData.data && spellData.data.length > 0) {
+                        results.spells = spellData;
+                        console.log("Found spell:", spellData.data[0].name);
+                    }
+                }
+                
                 console.log("API results:", results);
                 sendResponse({ success: true, data: results });
             } catch (e) {
@@ -103,5 +130,139 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         })();
         
         return true;
+    }
+});
+
+// Handle extension icon clicks for popup visibility toggle with visual feedback
+browserAPI.action.onClicked.addListener(async (tab) => {
+    try {
+        // Get current popup visibility state (default to false/disabled)
+        const result = await browserAPI.storage.sync.get(['popupVisible']);
+        const currentState = result.popupVisible === true; // Default to false
+        
+        // Toggle the state
+        const newState = !currentState;
+        
+        // Save new state
+        await browserAPI.storage.sync.set({ popupVisible: newState });
+        
+        console.log(`Popup ${newState ? 'visible' : 'hidden'} via icon click`);
+        
+        // Update icon to reflect state (visual indication)
+        if (newState) {
+            // Enabled state - show red "ON" badge
+            try {
+                await browserAPI.action.setIcon({
+                    path: {
+                        16: "icon.png",
+                        32: "icon.png",
+                        48: "icon.png",
+                        96: "icon.png"
+                    }
+                });
+                await browserAPI.action.setTitle({
+                    title: "Dofus Content Linker - Enabled"
+                });
+                // Set red "ON" badge for enabled state
+                await browserAPI.action.setBadgeText({ text: "ON" });
+                await browserAPI.action.setBadgeBackgroundColor({ color: "#ff0000" });
+                await browserAPI.action.setBadgeTextColor({ color: "#ffffff" });
+            } catch (e) {
+                console.log("Could not set enabled icon:", e);
+            }
+        } else {
+            // Disabled state - no badge (default state)
+            try {
+                // Use same icon but no badge for disabled state
+                await browserAPI.action.setIcon({
+                    path: {
+                        16: "icon.png",
+                        32: "icon.png",
+                        48: "icon.png",
+                        96: "icon.png"
+                    }
+                });
+                await browserAPI.action.setTitle({
+                    title: "Dofus Content Linker - Disabled"
+                });
+                // No badge for disabled state (default)
+                await browserAPI.action.setBadgeText({ text: "" });
+                await browserAPI.action.setBadgeBackgroundColor({ color: "#00ff00" });
+            } catch (e) {
+                console.log("Could not set disabled icon:", e);
+            }
+        }
+        
+        // Notify all content scripts about the popup visibility change
+        const tabs = await browserAPI.tabs.query({});
+        for (const currentTab of tabs) {
+            if (currentTab.url && currentTab.url.includes('dofuswiki.fandom.com')) {
+                try {
+                    await browserAPI.tabs.sendMessage(currentTab.id, {
+                        type: 'popupVisibilityChanged',
+                        visible: newState
+                    });
+                } catch (e) {
+                    // Ignore errors for tabs without content scripts
+                }
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error handling popup visibility toggle:', error);
+    }
+});
+
+// Initialize extension state on startup
+browserAPI.runtime.onStartup.addListener(async () => {
+    try {
+        const result = await browserAPI.storage.sync.get(['popupVisible']);
+        const isVisible = result.popupVisible === true; // Default to false
+        
+        // Set initial icon state
+        await browserAPI.action.setTitle({
+            title: `Dofus Content Linker - ${isVisible ? 'Enabled' : 'Disabled'}`
+        });
+        
+        // Set initial badge state
+        if (isVisible) {
+            await browserAPI.action.setBadgeText({ text: "ON" });
+            await browserAPI.action.setBadgeBackgroundColor({ color: "#ff0000" });
+            await browserAPI.action.setBadgeTextColor({ color: "#ffffff" });
+        } else {
+            await browserAPI.action.setBadgeText({ text: "" });
+            await browserAPI.action.setBadgeBackgroundColor({ color: "#00ff00" });
+        }
+        
+        console.log(`Extension initialized with popup ${isVisible ? 'visible' : 'hidden'}`);
+    } catch (error) {
+        console.error('Error initializing extension state:', error);
+    }
+});
+
+// Also initialize on installation
+browserAPI.runtime.onInstalled.addListener(async () => {
+    try {
+        const result = await browserAPI.storage.sync.get(['popupVisible']);
+        const isVisible = result.popupVisible === true; // Default to false
+        
+        // Set initial icon state
+        await browserAPI.action.setTitle({
+            title: `Dofus Content Linker - ${isVisible ? 'Enabled' : 'Disabled'}`
+        });
+        
+        // Set initial badge state
+        if (isVisible) {
+            await browserAPI.action.setBadgeText({ text: "ON" });
+            await browserAPI.action.setBadgeBackgroundColor({ color: "#ff0000" });
+            await browserAPI.action.setBadgeTextColor({ color: "#ffffff" });
+        } else {
+            await browserAPI.action.setBadgeText({ text: "" });
+            await browserAPI.action.setBadgeBackgroundColor({ color: "#00ff00" });
+        }
+        
+        console.log(`Extension installed with popup ${isVisible ? 'visible' : 'hidden'}`);
+    } catch (error) {
+        console.error('Error initializing extension on install:', error);
     }
 });
