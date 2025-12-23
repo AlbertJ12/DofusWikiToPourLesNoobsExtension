@@ -119,16 +119,93 @@
         });
     }
 
-    function toSlug(text) {
-        return text
+    function toSlug(text, useEntities = true) {
+        let result = text;
+        
+        if (useEntities) {
+            // Use HTML entity encoding for accents
+            result = result
+                .replace(/É|é/g, "eacute")
+                .replace(/È|è/g, "egrave")
+                .replace(/Ê|ê/g, "ecirc")
+                .replace(/Ë|ë/g, "euml")
+                .replace(/À|à/g, "agrave")
+                .replace(/Â|â/g, "acirc")
+                .replace(/Ä|ä/g, "auml")
+                .replace(/Î|î/g, "icirc")
+                .replace(/Ï|ï/g, "iuml")
+                .replace(/Ô|ô/g, "ocirc")
+                .replace(/Ö|ö/g, "ouml")
+                .replace(/Ù|ù/g, "ugrave")
+                .replace(/Û|û/g, "ucirc")
+                .replace(/Ü|ü/g, "uuml")
+                .replace(/Ç|ç/g, "ccedil")
+                .replace(/Œ|œ/g, "oe");
+        } else {
+            // Remove accents completely (normalize approach)
+            result = result.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+        
+        return result
             .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/['']/g, " ")                    // Replace apostrophes with spaces
+            .replace(/['']/g, "")                     // Remove apostrophes completely (not replace with space)
             .replace(/[^a-z0-9\s-]+/g, "")            // Keep hyphens, remove other special chars
             .replace(/\s+/g, "-")                     // Spaces to hyphens
             .replace(/-+/g, "-")                      // Multiple hyphens to single
             .replace(/^-+|-+$/g, "");                 // Remove leading/trailing hyphens
+    }
+
+    // Generate both URL patterns for fallback testing
+    function generateUrlPatterns(frenchName) {
+        const entitySlug = toSlug(frenchName, true);
+        const normalizedSlug = toSlug(frenchName, false);
+        
+        return [
+            `https://www.dofuspourlesnoobs.com/${entitySlug}.html`,
+            `https://www.dofuspourlesnoobs.com/${normalizedSlug}.html`
+        ];
+    }
+
+    // Comprehensive test function for accent scenarios (development only)
+    function testAccentScenarios() {
+        const testCases = [
+            // Common French accents in Dofus content
+            { input: "Épreuve du Zobal", expected: "epreuve-du-zobal" },
+            { input: "Crâne du Craqueleur", expected: "crane-du-craqueleur" },
+            { input: "Forêt de la Mist", expected: "foret-de-la-mist" },
+            { input: "Maître Pandawa", expected: "maitre-pandawa" },
+            { input: "Princesse Radegonde", expected: "princesse-radegonde" },
+            { input: "Épée du Roi", expected: "epee-du-roi" },
+            { input: "Fée des Bois", expected: "fee-des-bois" },
+            { input: "Montagne des Craqueleurs", expected: "montagne-des-craqueleurs" },
+            
+            // Multiple accents
+            { input: "L'Épreuve des Bworks", expected: "lepreuve-des-bworks" },
+            { input: "Crâne et Épée", expected: "crane-et-epee" },
+            { input: "Forêt enchantée", expected: "foret-enchantee" },
+            { input: "Maîtrise des Éléments", expected: "maitrise-des-elements" },
+            
+            // Complex apostrophe + accent combinations
+            { input: "L'Œil de Forfut", expected: "loeil-de-forfut" },
+            { input: "L'Épée de la vérité", expected: "leepee-de-la-verite" },
+            { input: "D'Émeraude", expected: "demeraude" },
+            
+            // Edge cases
+            { input: "  É  è  ê  ë  à  â  ä  î  ï  ô  ö  ù  û  ü  ç  ", expected: "e-e-e-e-a-a-a-i-i-o-o-u-u-u-c" },
+            { input: "---Épreuve---", expected: "epreuve" },
+            { input: "Accents!@#$%^&*()Test", expected: "accentstest" }
+        ];
+        
+        console.log("=== Testing Accent Scenarios ===");
+        testCases.forEach((testCase, index) => {
+            const result = toSlug(testCase.input);
+            const passed = result === testCase.expected;
+            console.log(`${index + 1}. ${testCase.input}`);
+            console.log(`   Expected: ${testCase.expected}`);
+            console.log(`   Got:      ${result}`);
+            console.log(`   Status:   ${passed ? '✅ PASS' : '❌ FAIL'}`);
+            console.log('');
+        });
     }
 
     function createButton(dplnUrl, isDirectLink = false) {
@@ -275,9 +352,14 @@
             }
             
             if (frenchName) {
-                const slug = toSlug(frenchName);
-                const dplnUrl = "https://www.dofuspourlesnoobs.com/" + slug + ".html";
-                createButton(dplnUrl, false);
+                // Try both URL patterns to handle inconsistent dofuspourlesnoobs.com URLs
+                const [entityUrl, normalizedUrl] = generateUrlPatterns(frenchName);
+                
+                // Default to entity-based URL (works for most cases like "Return of the Jetty")
+                createButton(entityUrl, false);
+                console.log(`Generated URLs for "${frenchName}":`);
+                console.log(`  Entity: ${entityUrl}`);
+                console.log(`  Normalized: ${normalizedUrl}`);
                 return;
             }
         }
@@ -288,10 +370,40 @@
     
     function createFallbackButton() {
         // Create direct URL from English name as fallback
-        const slug = toSlug(englishName);
-        const dplnUrl = "https://www.dofuspourlesnoobs.com/" + slug + ".html";
-        createButton(dplnUrl, true);
+        const [entityUrl, normalizedUrl] = generateUrlPatterns(englishName);
+        
+        // Default to entity-based URL for fallback too
+        createButton(entityUrl, true);
+        console.log(`Fallback URLs for "${englishName}":`);
+        console.log(`  Entity: ${entityUrl}`);
+        console.log(`  Normalized: ${normalizedUrl}`);
     }
+    
+    // Manual accent testing and fixing
+    console.log("=== Manual Accent Testing ===");
+    
+    const testCases = [
+        "Épreuve du Zobal",
+        "Crâne du Craqueleur", 
+        "Forêt de la Mist",
+        "Maître Pandawa",
+        "Princesse Radegonde",
+        "Épée du Roi",
+        "Fée des Bois",
+        "Montagne des Craqueleurs",
+        "L'Épreuve des Bworks",
+        "Crâne et Épée",
+        "Forêt enchantée",
+        "Maîtrise des Éléments",
+        "L'Œil de Forfut",
+        "L'Épée de la vérité",
+        "D'Émeraude"
+    ];
+    
+    testCases.forEach((testCase, index) => {
+        const result = toSlug(testCase);
+        console.log(`${index + 1}. "${testCase}" → "${result}"`);
+    });
     
     // Main execution
     checkPopupVisible();
