@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dofus Quest Linker",
-  "version": "1.4",
+  "version": "1.5",
   "description": "Adds a button on any Dofus Wiki page to open the corresponding DofusPourLesNoobs page with French names for quests, items, monsters, areas, and dungeons.",
   "permissions": [
     "activeTab",
