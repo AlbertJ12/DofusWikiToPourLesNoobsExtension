@@ -9,8 +9,10 @@
     const titleElem = document.querySelector("h1");
     if (!titleElem) return;
     
-    const englishName = titleElem.innerText.trim();
-    console.log("Found Dofus Wiki page:", englishName);
+    const rawEnglishName = titleElem.innerText.trim();
+    // Strip parenthetical suffixes like "(quest)", "(monster)", etc.
+    const englishName = rawEnglishName.replace(/\s*\([^)]+\)\s*$/g, '').trim();
+    console.log("Found Dofus Wiki page:", rawEnglishName, "→ Cleaned:", englishName);
     
     // Determine page type for better content matching
     function getPageType() {
@@ -358,6 +360,9 @@
         "on recherche ka'youloud": "on-recherche-ka-youloud",
         "on recherche le shushu debruk'sayl": "on-recherche-le-shushu-debruk-sayl",
         "reconnaissance de dette": "reconnaissance-de-dettes",
+        "un pouvoir mérydique": "un-pouvoir-merydique",
+        "l'anneau de tot": "lanneau-de-tot",
+        "série animalière": "serie-animaliere",
     };
     
     // Check if quest has a hardcoded exception
@@ -585,26 +590,15 @@
         const entityUrl = `https://www.dofuspourlesnoobs.com/${entitySlug}.html`;
         
         // Smart priority logic:
-        // 1. Apprentissage quests generally use normalized URLs (except dark-themed with entity encoding)
-        // 2. Other quests with accents try entity-encoded first
-        // 3. Quests without accents try normalized first
+        // Website uses BOTH normalized and entity-encoded URLs
+        // URL validation will check both and use whichever works
+        // Priority based on historical data:
+        // - Quests with accents: entity-encoded works slightly better
+        // - Quests without accents: normalized works better
         
         const questHasAccents = hasAccents(frenchName);
-        const isApprentissage = frenchName.toLowerCase().startsWith('apprentissage');
         
-        // Apprentissage quests prefer normalized (accents removed)
-        if (isApprentissage) {
-            console.log(`🎓 Apprentissage quest - using normalized first`);
-            console.log(`📋 Primary URL (normalized): ${normalizedUrl}`);
-            console.log(`📋 Fallback URL (entity): ${entityUrl}`);
-            return {
-                primary: normalizedUrl,
-                fallback: entityUrl,
-                frenchName: frenchName
-            };
-        }
-        // Other quests with accents try entity-encoded first
-        else if (questHasAccents) {
+        if (questHasAccents) {
             console.log(`✨ Quest has accents - trying entity-encoded first`);
             console.log(`📋 Primary URL (entity): ${entityUrl}`);
             console.log(`📋 Fallback URL (normalized): ${normalizedUrl}`);
@@ -613,9 +607,7 @@
                 fallback: normalizedUrl,
                 frenchName: frenchName
             };
-        }
-        // Quests without accents use normalized
-        else {
+        } else {
             console.log(`📋 Primary URL (normalized): ${normalizedUrl}`);
             console.log(`📋 Fallback URL (entity): ${entityUrl}`);
             return {
@@ -654,10 +646,6 @@
             
             const existingBtn = document.getElementById("dofus-quest-linker-btn");
             if (existingBtn) existingBtn.remove();
-            
-            // Track which URL to try (starts with primary)
-            let currentUrlIndex = 0;
-            const urls = [urlVariants.primary, urlVariants.fallback];
             
             // Create container with correct original styling
             const container = document.createElement("div");
@@ -731,27 +719,28 @@
             };
                 
             // Add click handler with fallback support
+            let currentUrlIndex = 0;
+            const urls = [urlVariants.primary, urlVariants.fallback];
+            
             container.onclick = () => {
                 const urlToOpen = urls[currentUrlIndex];
                 console.log(`🔗 Opening URL: ${urlToOpen}`);
-                console.log(`💡 If this doesn't work, the fallback URL is: ${urls[1 - currentUrlIndex]}`);
                 window.open(urlToOpen, "_blank");
             };
             
-            // Add right-click handler to try fallback URL
+            // Right-click to switch to fallback URL
             container.oncontextmenu = (e) => {
                 e.preventDefault();
-                currentUrlIndex = 1 - currentUrlIndex; // Toggle between 0 and 1
+                currentUrlIndex = 1 - currentUrlIndex;
                 const nextUrl = urls[currentUrlIndex];
                 console.log(`🔄 Switched to ${currentUrlIndex === 0 ? 'PRIMARY' : 'FALLBACK'} URL: ${nextUrl}`);
                 subtitle.textContent = currentUrlIndex === 0 ? 'Open Guide' : 'Try Fallback';
                 subtitle.style.color = currentUrlIndex === 0 ? '#ffffff' : '#ffa500';
             };
-                
+            
             // Add to page
             document.body.appendChild(container);
-            console.log("✅ Button created with fallback support");
-            console.log("💡 Right-click button to switch between primary and fallback URLs");
+            console.log("✅ Button created with validated URL");
             console.log("🔓 Button creation lock released");
             isCreatingButton = false;
         });

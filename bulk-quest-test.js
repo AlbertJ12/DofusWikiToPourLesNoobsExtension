@@ -2,11 +2,21 @@
  * BULK QUEST URL TESTING
  * 
  * Fetches all quests from DofusDB API and tests URL generation.
+ * This test EXACTLY MATCHES the extension's behavior:
+ * 1. Generates primary + fallback URLs using same logic as content.js
+ * 2. Validates primary URL first (HEAD request)
+ * 3. If primary fails, validates fallback URL
+ * 4. Reports the final URL the user would receive (or no button if both fail)
  * 
  * Modes:
  * 1. GENERATION_ONLY: Just test slug generation (fast, no network requests)
  * 2. VERIFY_FAILURES: Test generation + verify failed URLs exist on website (slow)
  * 3. VERIFY_ALL: Test generation + verify ALL URLs (very slow, ~2000 requests)
+ * 
+ * This test validates ACTUAL USER EXPERIENCE:
+ * - Which quests show a button
+ * - Which URL the button opens (primary or fallback)
+ * - Which quests have no button (both URLs fail)
  * 
  * Usage:
  *   node bulk-quest-test.js                    # Generation only
@@ -241,6 +251,9 @@ const URL_EXCEPTIONS = {
     "on recherche ka'youloud": "on-recherche-ka-youloud",
     "on recherche le shushu debruk'sayl": "on-recherche-le-shushu-debruk-sayl",
     "reconnaissance de dette": "reconnaissance-de-dettes",
+    "un pouvoir mérydique": "un-pouvoir-merydique",
+    "l'anneau de tot": "lanneau-de-tot",
+    "série animalière": "serie-animaliere",
 };
 
 // Check if quest has a hardcoded exception
@@ -450,30 +463,16 @@ function generateUrlVariants(frenchName) {
     const normalizedUrl = `https://www.dofuspourlesnoobs.com/${normalizedSlug}.html`;
     const entityUrl = `https://www.dofuspourlesnoobs.com/${entitySlug}.html`;
     
-    // Smart priority logic:
-    // 1. Apprentissage quests generally use normalized URLs (except dark-themed with entity encoding)
-    // 2. Other quests with accents try entity-encoded first
-    // 3. Quests without accents try normalized first
-    
+    // Website uses BOTH normalized and entity-encoded URLs
+    // Use entity-encoded for accented quests, normalized for non-accented
     const questHasAccents = hasAccents(frenchName);
-    const isApprentissage = frenchName.toLowerCase().startsWith('apprentissage');
     
-    // Apprentissage quests prefer normalized (accents removed)
-    if (isApprentissage) {
-        return {
-            primary: normalizedUrl,
-            fallback: entityUrl
-        };
-    }
-    // Other quests with accents try entity-encoded first
-    else if (questHasAccents) {
+    if (questHasAccents) {
         return {
             primary: entityUrl,
             fallback: normalizedUrl
         };
-    }
-    // Quests without accents use normalized
-    else {
+    } else {
         return {
             primary: normalizedUrl,
             fallback: entityUrl
@@ -631,33 +630,53 @@ async function testQuests(quests) {
         const englishName = quest.name.en || 'Unknown';
         
         try {
-            // Generate both URL variants
+            // Generate URLs using the SAME logic as content.js
+            // This ensures we're testing what the extension actually produces
             const urls = generateUrlVariants(frenchName);
             results.tested++;
             
-            // Verify URLs if needed
+            // Verify URLs if needed - match extension behavior exactly
             if (MODE === 'VERIFY_ALL' || MODE === 'VERIFY_FAILURES') {
                 await sleep(RATE_LIMIT_MS);
                 const primaryExists = await checkUrlExists(urls.primary);
                 
+                let finalUrl = null;
+                let usedFallback = false;
+                
                 if (primaryExists) {
+                    // Primary works - this is what user gets
+                    finalUrl = urls.primary;
                     results.primaryWorks++;
-                } else {
-                    // Try fallback
+                } else if (urls.primary !== urls.fallback) {
+                    // Primary failed, check fallback (only if different)
                     await sleep(RATE_LIMIT_MS);
                     const fallbackExists = await checkUrlExists(urls.fallback);
                     
                     if (fallbackExists) {
+                        // Fallback works - this is what user gets
+                        finalUrl = urls.fallback;
+                        usedFallback = true;
                         results.fallbackWorks++;
-                    } else {
-                        results.bothFail++;
-                        results.urlCheckFailed.push({
-                            id: quest.id,
-                            english: englishName,
-                            french: frenchName,
-                            primaryUrl: urls.primary,
-                            fallbackUrl: urls.fallback
-                        });
+                    }
+                }
+                
+                // If no valid URL found, user gets no button
+                if (!finalUrl) {
+                    results.bothFail++;
+                    results.urlCheckFailed.push({
+                        id: quest.id,
+                        english: englishName,
+                        french: frenchName,
+                        primaryUrl: urls.primary,
+                        fallbackUrl: urls.fallback,
+                        result: 'NO_BUTTON',
+                        note: 'Extension will not show button - no valid URL found'
+                    });
+                } else {
+                    // Record which URL the user actually receives
+                    if (usedFallback) {
+                        // Log fallback usage for analysis
+                        console.log(`   ⚠️  [${quest.id}] "${englishName}" uses fallback`);
                     }
                 }
             }
@@ -689,14 +708,27 @@ function printResults(results) {
     console.log(`   Successfully tested: ${results.tested}`);
     
     if (MODE !== 'GENERATION_ONLY') {
-        console.log(`\n   ✅ Primary URL works: ${results.primaryWorks}`);
-        console.log(`   🔄 Fallback URL works: ${results.fallbackWorks}`);
-        console.log(`   ❌ Both URLs fail: ${results.bothFail}`);
+        console.log(`\n   ✅ Button shown with primary URL: ${results.primaryWorks}`);
+        console.log(`   🔄 Button shown with fallback URL: ${results.fallbackWorks}`);
+        console.log(`   ❌ No button shown (no valid URL): ${results.bothFail}`);
         
-        const totalVerified = results.primaryWorks + results.fallbackWorks;
+        const totalWithButton = results.primaryWorks + results.fallbackWorks;
         const totalTested = results.primaryWorks + results.fallbackWorks + results.bothFail;
-        const successRate = totalTested > 0 ? (totalVerified / totalTested * 100).toFixed(1) : 0;
-        console.log(`\n   📊 Coverage: ${totalVerified}/${totalTested} (${successRate}%)`);
+        const successRate = totalTested > 0 ? (totalWithButton / totalTested * 100).toFixed(1) : 0;
+        console.log(`\n   📊 User Experience: ${totalWithButton}/${totalTested} quests show button (${successRate}%)`);
+        
+        if (results.fallbackWorks > 0) {
+            const fallbackRate = (results.fallbackWorks / totalWithButton * 100).toFixed(1);
+            console.log(`   ⚠️  ${results.fallbackWorks} quests (${fallbackRate}%) require fallback URL`);
+        }
+        
+        // Add warning about quests without buttons
+        if (results.bothFail > 0) {
+            console.log(`\n   ⚠️  ${results.bothFail} quests have no button - these may be:`);
+            console.log(`      • Name mismatches between API and website`);
+            console.log(`      • Quests without individual pages`);
+            console.log(`      • Missing URL exceptions`);
+        }
     }
     
     console.log(`\n   Generation errors: ${results.failed.length}`);

@@ -1,0 +1,182 @@
+{
+  "total": 1579,
+  "noFrenchName": 0,
+  "tested": 1579,
+  "primaryWorks": 1274,
+  "fallbackWorks": 286,
+  "bothFail": 19,
+  "failed": [],
+  "urlCheckFailed": [
+    {
+      "id": 229,
+      "english": "The Koalak Costume",
+      "french": "Le déguisement du Koalak",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/le-deacuteguisement-du-koalak.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/le-deguisement-du-koalak.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 272,
+      "english": "Murder Mostly Foul",
+      "french": "Assassinat effectué",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/assassinat-effectueacute.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/assassinat-effectue.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 470,
+      "english": "An Excessive Baker's Dozen",
+      "french": "Un bon gros par dix-neuf",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/un-bon-gros-par-dix-neuf.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/un-bon-gros-par-dix-neuf.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 494,
+      "english": "The Great Manitou",
+      "french": "Le Grand Manitou",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/le-grand-manitou.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/le-grand-manitou.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 630,
+      "english": "Wanted: Count Harebourg",
+      "french": "On recherche le Comte Harebourg",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/on-recherche-le-comte-harebourg.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/on-recherche-le-comte-harebourg.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 648,
+      "english": "Xiz Tp Nvdi Ibuf?",
+      "french": "Qpvsrvpj ubou ef ibjof ?",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/qpvsrvpj-ubou-ef-ibjof.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/qpvsrvpj-ubou-ef-ibjof.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 662,
+      "english": "Fifth Post",
+      "french": "Cinquième postage",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/cinquiegraveme-postage.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/cinquieme-postage.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 668,
+      "english": "Eleventh Post",
+      "french": "Onzième postage",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/onziegraveme-postage.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/onzieme-postage.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 670,
+      "english": "Thirteenth Post",
+      "french": "Treizième postage",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/treiziegraveme-postage.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/treizieme-postage.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 671,
+      "english": "Fourteenth Post",
+      "french": "Quatorzième postage",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/quatorziegraveme-postage.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/quatorzieme-postage.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 679,
+      "english": "Pocket Money",
+      "french": "Les indésirables",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/les-indeacutesirables.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/les-indesirables.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1298,
+      "english": "Too Sinister",
+      "french": "Trop sinistre",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/trop-sinistre.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/trop-sinistre.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1378,
+      "english": "Offering for Tholank",
+      "french": "Offrande �� Tholank",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/offrande-tholank.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/offrande-tholank.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1457,
+      "english": "Ear-Yanking Apprenticeship",
+      "french": "Apprentissage en tirage d'oreilles",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/apprentissage-en-tirage-doreilles.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/apprentissage-en-tirage-doreilles.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1458,
+      "english": "Bachelor's in Pain Distribution",
+      "french": "Licence en distribution de pains",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/licence-en-distribution-de-pains.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/licence-en-distribution-de-pains.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1459,
+      "english": "Masters in Slappery",
+      "french": "Maîtrise en flanquage de rouste",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/maicirctrise-en-flanquage-de-rouste.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/maitrise-en-flanquage-de-rouste.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1460,
+      "english": "Doctorate in Butt-Kicking",
+      "french": "Doctorat en bottage de fesses",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/doctorat-en-bottage-de-fesses.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/doctorat-en-bottage-de-fesses.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 1930,
+      "english": "Wanted: The No-Face",
+      "french": "On recherche le Sans Visage",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/on-recherche-le-sans-visage.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/on-recherche-le-sans-visage.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    },
+    {
+      "id": 2462,
+      "english": "Modster Go!",
+      "french": "Altéré Go !",
+      "primaryUrl": "https://www.dofuspourlesnoobs.com/altere-go.html",
+      "fallbackUrl": "https://www.dofuspourlesnoobs.com/altere-go.html",
+      "result": "NO_BUTTON",
+      "note": "Extension will not show button - no valid URL found"
+    }
+  ]
+}
