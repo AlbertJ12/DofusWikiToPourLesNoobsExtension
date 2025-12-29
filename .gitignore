@@ -1,2 +1,4 @@
 web-ext-artifacts
+bulk-test-results.json
+node_modules/
 .amo-upload-uuid

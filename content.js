@@ -142,11 +142,9 @@
                 }
                 
                 if (frenchName) {
-                    // Test both URL patterns to find the working one
-                    const [entityUrl, normalizedUrl] = generateUrlPatterns(frenchName);
-                    
-                    // Pass URLs in correct order for smart selection [entity, normalized]
-                    testUrlsAndCreateButton([entityUrl, normalizedUrl], frenchName);
+                    // Generate both URL variants (normalized + entity-encoded fallback)
+                    const urlVariants = generateUrlVariants(frenchName);
+                    createButtonWithFallback(urlVariants);
                     return;
                 }
             }
@@ -158,122 +156,604 @@
         });
     }
 
-    function toSlug(text, useEntities = true) {
-        let result = text;
+    // Hardcoded exceptions for quests with unpredictable URL patterns
+    const URL_EXCEPTIONS = {
+        // Apostrophe exceptions (keep hyphens)
+        "wogew l'hewmite": "wogew-l-hewmite",
+        "si j'avais un marteau": "si-j-avais-un-marteau",
+        "la tactique des gens d'armes": "la-tactique-des-gens-d-armes",
+        "à la poursuite d'octolliard rouge": "a-la-poursuite-d-octolliard-rouge",
+        "sram d'égoutant": "sram-d-egoutant",
+        "quand y'en a marre de brâkmar": "quand-y-en-a-marre-de-brakmar",
+        "crocs n'en bourrent": "crocs-n-en-bourrent",
+        "vilain petit n'enfant": "vilain-petit-nrsquoenfant",
+        "barnabé dans l'espace": "barnabe-dans-l-espace",
+        "t'as les boules": "t-as-les-boules",
         
-        if (useEntities) {
-            // Use HTML entity encoding for accents
-            result = result
-                .replace(/É|é/g, "eacute")
-                .replace(/È|è/g, "egrave")
-                .replace(/Ê|ê/g, "ecirc")
-                .replace(/Ë|ë/g, "euml")
-                .replace(/À|à/g, "agrave")
-                .replace(/Â|â/g, "acirc")
-                .replace(/Ä|ä/g, "auml")
-                .replace(/Î|î/g, "icirc")  // Combined pattern for both Î and î
-                .replace(/Ï|ï/g, "iuml")
-                .replace(/Ô|ô/g, "ocirc")
-                .replace(/Ö|ö/g, "ouml")
-                .replace(/Ù|ù/g, "ugrave")
-                .replace(/Û|û/g, "ucirc")
-                .replace(/Ü|ü/g, "uuml")
-                .replace(/Ç|ç/g, "ccedil")
-                .replace(/Œ|œ/g, "oe");
-        } else {
-            // Remove accents completely (normalize approach)
-            result = result.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        // Apprentissage double-hyphen exceptions (not dark-themed but use --)
+        "apprentissage : surineur": "apprentissage--surineur",
+        "apprentissage : chasseur d'âmes": "apprentissage--chasseur-dacircmes",
+        "apprentissage : maître des sévices": "apprentissage--maicirctre-des-seacutevices",
+        "apprentissage : psychopathe": "apprentissage--psychopathe",
+        "apprentissage : disciple de ménalt": "apprentissage--disciple-de-meacutenalt",
+        "apprentissage : disciple de djaul": "apprentissage--disciple-de-djaul",
+        "apprentissage : disciple d'hécate": "apprentissage--disciple-dheacutecate",
+        "apprentissage : disciple de brumaire": "apprentissage--disciple-de-brumaire",
+        
+        // Name mismatches (API name != website name)
+        "la serveuse dame cloude": "la-tenanciere-dame-cloude",
+        "bienvenue au krazybwork saloon": "bienvenue-au-krazybwok-saloon",
+        "la fatalité": "la-fataliteacute-prologue",
+        
+        // Plural/singular mismatches
+        "gros œuvre au château d'allister": "gros-oeliguvres-au-chacircteau-dallister",
+        "crocs en jambe": "crocs-en-jambes",
+        "faire le tas de pins": "faire-le-tas-de-pin",
+        
+        // Entity encoding needed
+        "la mort vous va si bien": "-la-mort-vous-va-si-bien",
+        "l'essentiel est dans lac gelé": "lessentiel-est-dans-le-lac-geleacute",
+        "cœur brisé": "coeur-briseacute",
+        "où est passée la 7e compagnie ?": "ougrave-est-passeacutee-la-7-e-compagnie",
+        "une enquête alambiquée - investigation": "une-enquecircte-alambiqueacutee---investigation",
+        "une enquête alambiquée - identification": "une-enquecircte-alambiqueacutee---identification",
+        "une enquête alambiquée - confrontation": "une-enquecircte-alambiqueacutee---confrontation",
+        "une enquête alambiquée - résolution": "une-enquecircte-alambiqueacutee---reacutesolution",
+        
+        // Special encoding patterns (rsquo for apostrophes, oelig for œ)
+        "l'œuf ou la cawotte ?": "lrsquooeliguf-ou-la-cawotte",
+        "fraîcheur de l'ivre": "fraicirccheur-de-lrsquoivre",
+        
+        // L'Étoile quests (all use lrsquoeacutetoile pattern)
+        "l'étoile des was mages": "lrsquoeacutetoile-des-was-mages",
+        "l'étoile du sapik": "lrsquoeacutetoile-du-sapik",
+        "l'étoile des glutins farceurs": "lrsquoeacutetoile-des-glutins-farceurs",
+        "l'étoile de l'atelier": "lrsquoeacutetoile-de-lrsquoatelier",
+        "l'étoile des donjons": "lrsquoeacutetoile-des-donjons",
+        "l'étoile des grincheux": "lrsquoeacutetoile-des-grincheux",
+        
+        // Gare aux krokilles (all combined on one page)
+        "gare aux krokilles juvéniles": "gare-aux-krokilles-juveacutenilesnovicesmaturesveacuteneacuterables",
+        "gare aux krokilles novices": "gare-aux-krokilles-juveacutenilesnovicesmaturesveacuteneacuterables",
+        "gare aux krokilles matures": "gare-aux-krokilles-juveacutenilesnovicesmaturesveacuteneacuterables",
+        "gare aux krokilles vénérables": "gare-aux-krokilles-juveacutenilesnovicesmaturesveacuteneacuterables",
+        
+        // C'est votre métier quests (use c-est with hyphens, not cest)
+        "bûcher, c'est votre métier": "bucher-c-est-votre-metier",
+        "piocher, c'est votre métier": "piocher-c-est-votre-metier",
+        "cueillir, c'est votre métier": "cueillir-c-est-votre-metier",
+        "pêcher, c'est votre métier": "pecher-c-est-votre-metier",
+        "chasser, c'est votre métier": "chasser-c-est-votre-metier",
+        
+        // More apostrophe with hyphen patterns
+        "le dragon des forêts": "le-dragon-des-foret",
+        "retrouver un fémur dans une botte d'ossements": "retrouver-un-femur-dans-une-botte-d-ossements",
+        "l'eau douce ou l'eau dure": "l-eau-douce-ou-l-eau-dure",
+        "des étoiles dans l'estomac": "des-etoiles-dans-l-estomac",
+        "l'archéologie, c'est facile": "l-archeologie-c-est-facile",
+        
+        // Additional Apprentissage double-hyphen quests
+        "apprentissage : gardien du savoir": "apprentissage--gardien-du-savoir",
+        "apprentissage : gardien des tortures": "apprentissage--gardien-des-tortures",
+        
+        // More apostrophe with hyphen patterns
+        "le mort dans l'âme": "le-mort-dans-l-ame",
+        "la croisière, ça m'use": "la-croisiere-ca-m-use",
+        "battre le fer tant qu'il est chaud": "battre-le-fer-tant-qu-il-est-chaud",
+        "la quête sous l'eau": "la-quete-sous-l-eau",
+        "les principes d'archie m'aident": "les-principes-d-archie-m-aident",
+        "tournée d'inspection": "tournee-d-inspection",
+        "tarot, t'es très fort": "tarot-t-es-tres-fort",
+        "bière qui roule n'amasse pas mousse": "biere-qui-roule-n-amasse-pas-mousse",
+        "légende d'automne": "legende-d-automne",
+        "les deux font l'impair": "les-deux-font-l-impair",
+        "qui sème le vent récolte l'artempeth": "qui-seme-le-vent-recolte-l-artempeth",
+        "l'invasion des profanateurs de sépultures": "l-invasion-des-profanateurs-de-sepulture",
+        "œufs dans l'eau": "oeufs-dans-l-eau",
+        
+        // Combined pages (touriste/amateur/spécialiste/expert on one page)
+        "cueillette de coquillages pour touriste": "cueillette-de-coquillages-pour-touristeamateurspeacutecialisteexpert",
+        "cueillette de coquillages pour amateur": "cueillette-de-coquillages-pour-touristeamateurspeacutecialisteexpert",
+        "cueillette de coquillages pour spécialiste": "cueillette-de-coquillages-pour-touristeamateurspeacutecialisteexpert",
+        "cueillette de coquillages pour expert": "cueillette-de-coquillages-pour-touristeamateurspeacutecialisteexpert",
+        "chasse aux krokilles pour touriste": "chasse-aux-krokilles-pour-touristeamateurspeacutecialisteexpert",
+        "chasse aux krokilles pour amateur": "chasse-aux-krokilles-pour-touristeamateurspeacutecialisteexpert",
+        "chasse aux krokilles pour spécialiste": "chasse-aux-krokilles-pour-touristeamateurspeacutecialisteexpert",
+        "chasse aux krokilles pour expert": "chasse-aux-krokilles-pour-touristeamateurspeacutecialisteexpert",
+        "kilukru pour touriste": "kilukru-pour-touristeamateurspeacutecialisteexpert",
+        "kilukru pour amateur": "kilukru-pour-touristeamateurspeacutecialisteexpert",
+        "kilukru pour spécialiste": "kilukru-pour-touristeamateurspeacutecialisteexpert",
+        "kilukru pour expert": "kilukru-pour-touristeamateurspeacutecialisteexpert",
+        "éklate vulkaine pour touriste": "eklate-vulkaine-pour-touristeamateurspeacutecialisteexpert",
+        "éklate vulkaine pour amateur": "eklate-vulkaine-pour-touristeamateurspeacutecialisteexpert",
+        "éklate vulkaine pour spécialiste": "eklate-vulkaine-pour-touristeamateurspeacutecialisteexpert",
+        "éklate vulkaine pour expert": "eklate-vulkaine-pour-touristeamateurspeacutecialisteexpert",
+        
+        // More apostrophe with hyphen patterns
+        "qui vole un œuf cherche l'embrouille": "qui-vole-un-oeuf-cherche-l-embrouille",
+        "le fabuleux festin d'amélie poêlon": "le-fabuleux-festin-d-amelie-poelon",
+        "fée d'hiver": "fee-d-hiver",
+        "jusqu'au bout du rêve": "jusqu-au-bout-du-reve",
+        "s'armer contre le destin": "s-armer-contre-le-destin",
+        "le silence est d'aure": "le-silence-est-d-aure",
+        "les problèmes d'une pictopublicéphile": "les-problemes-d-une-pictopublicephile",
+        
+        // Formation quests (plural forms)
+        "formation des première année": "formation-des-premiegraveres-anneacutees",
+        "formation des deuxième année": "formation-des-deuxiegravemes-anneacutees",
+        "formation des troisième année": "formation-des-troisiegravemes-anneacutees",
+        "formation des quatrième année": "formation-des-quatriegravemes-anneacutees",
+        "formation des cinquième année": "formation-des-cinquiegravemes-anneacutees",
+        "formation des sixième année": "formation-des-sixiegravemes-anneacutees",
+        "formation des septième année": "formation-des-septiegravemes-anneacutees",
+        "formation des huitième année": "formation-des-huitiegravemes-anneacutees",
+        "formation des neuvième année": "formation-des-neuviegravemes-anneacutees",
+        "formation des dixième année": "formation-des-dixiegravemes-anneacutees",
+        
+        // Special encoding (ç → ccedila)
+        "ça saute aux œufs": "ccedila-saute-aux-oeufs",
+        
+        // Accent entity encoding required
+        "métamorphoooose !": "meacutetamorphoooose",
+        
+        // Plural/singular mismatches
+        "squelettes et amulette": "squelettes-et-amulettes",
+        "sanctuaires de famille": "sanctuaire-de-famille",
+        
+        // Apostrophe with hyphen variations
+        "de l'autre côté du chalœil": "de-lautre-cocircteacute-du-chaloeil",
+        "l'ascension de qu'tan": "l-ascension-de-qu-tan",
+        "le dofus et l'alchimiste": "le-dofus-et-l-alchimiste",
+        "donner l'amour, pas le fouet": "donner-l-amour-pas-le-fouet",
+        "à plus dans l'muldobus": "a-plus-dans-l-muldobus",
+        "c'est toujours dur le matin": "c-est-toujours-dur-le-matin",
+        "à l'ombre des murs": "a-l-ombre-des-murs",
+        "sur la route d'erazal": "sur-la-route-d-erazal",
+        "c'est pour ta pomme": "c-est-pour-ta-pomme",
+        "c'est pourtant naturel": "c-est-pourtant-naturel",
+        "trempette dans un verre d'eau": "trempette-dans-un-verre-d-eau",
+        "question d'évolution": "question-d-evolution",
+        "rencontres d'un soir": "rencontres-d-un-soir",
+        "elle n'a pas fini d'aimer la viande": "elle-n-a-pas-fini-d-aimer-la-viande",
+        "le monde à l'envers": "le-monde-a-l-envers-partie1",
+        "en manque d'inspiration": "en-manque-d-inspiration",
+        "la guerre de cania n'aura pas lieu": "la-guerre-de-cania-n-aura-pas-lieu",
+        "présence d'esprits": "presence-d-esprits",
+        "les métamorphoses d'un tanuki": "les-metamorphoses-d-un-tanuki",
+        "les habitudes ont l'eau-de-vie dure": "les-habitudes-ont-l-eau-de-vie-dure",
+        "gobstination d'un grobelin": "gobstination-d-un-grobelin",
+        "sang d'encre": "sang-d-encre",
+        "jusqu'à leur dernier soupir": "jusqu-a-leur-dernier-soupir",
+        "de l'encre spectaculaire": "de-l-encre-spectaculaire",
+        "quand l'éveil n'est qu'un songe": "quand-l-eveil-n-est-qu-un-songe",
+        "par ce serment s'écrit le monde": "par-ce-serment-s-ecrit-le-monde",
+        "au détour d'un rêve perdu": "au-detour-d-un-reve-perdu",
+        "sos d'un douzien en détresse": "sos-d-un-douzien-en-detresse",
+        "de l'eau dans la chair": "de-l-eau-dans-la-chair",
+        "leçon d'histoire": "lecon-d-histoire",
+        "soldats d'infortune": "soldats-d-infortune",
+        "quand les esprits s'échauffent": "quand-les-esprits-s-echauffent",
+        "l'opportunité d'un jour": "l-opportunite-d-un-jour",
+        "gladiateur dans l'âme": "gladiateur-dans-l-ame",
+        "tour d'honneur": "tour-d-honneur",
+        "c'est du bateau": "c-est-du-bateau",
+        "c'est radical ici": "c-est-radical-ici",
+        "rien n'est tout noir, ni tout blanc": "rien-n-est-tout-noir-ni-tout-blanc",
+        "altéré go !": "altere-go",
+        "chercher un marteau-aigri dans une galerie d'ereboria": "chercher-un-marteau-aigri-dans-une-galerie-d-ereboria",
+        "par l'héritage qui vous lie": "par-l-heritage-qui-vous-lie",
+        "le cœur d'un compagnon est fait comme une auberge...": "le-coeur-d-un-compagnon-est-fait-comme-une-auberge",
+        "les derniers d'entre nous": "les-derniers-d-entre-nous",
+        "rokwa : voie du poing": "rokwa-voie-du-poing",
+        "gokwa : voie du bâton": "gokwa-voie-du-baton",
+        "yonkwa : voie du sabre": "yonkwa-voie-du-sabre",
+        "sankwa : voie du bouclier": "sankwa-voie-du-bouclier",
+        "nikwa : voie des cinq griffes": "nikwa-voie-des-cinq-griffes",
+        "ikwa : voie du guerrier ivre": "ikwa-voie-du-guerrier-ivre",
+        "shodanwa : perfection martiale": "shodanwa-perfection-martiale",
+        "nidanwa : harmonie intérieure": "nidanwa-harmonie-interieure",
+        "sandanwa : pluralité martiale": "sandanwa-pluralite-martiale",
+        "yondanwa : maîtrise absolue": "yondanwa-maitrise-absolue",
+        "godanwa : transcendance": "godanwa-transcendance",
+        "on recherche ka'youloud": "on-recherche-ka-youloud",
+        "on recherche le shushu debruk'sayl": "on-recherche-le-shushu-debruk-sayl",
+        "reconnaissance de dette": "reconnaissance-de-dettes",
+    };
+    
+    // Check if quest has a hardcoded exception
+    function getUrlException(text) {
+        const lower = text.toLowerCase();
+        return URL_EXCEPTIONS[lower] || null;
+    }
+    
+    // Detect which apostrophe pattern to use based on quest name
+    function detectApostrophePattern(text) {
+        const lower = text.toLowerCase();
+        
+        // Pattern 1: "On recherche" quests keep ALL apostrophe hyphens
+        if (lower.startsWith('on recherche')) {
+            return 'keep-all-hyphens';
         }
         
-        console.log(`🔍 DEBUG toSlug input: "${text}" (useEntities: ${useEntities})`);
+        // Pattern 2: "On m'appelle" quests keep apostrophe hyphens
+        if (lower.startsWith("on m'appelle")) {
+            return 'keep-all-hyphens';
+        }
+        
+        // Pattern 3: Quests with "d'identité" or "d'Allister" keep d' hyphen
+        if (lower.includes("d'identité") || lower.includes("d'allister")) {
+            return 'keep-d-hyphen';
+        }
+        
+        // Pattern 4: Dark/Sombre Apprentissage quests use double hyphen
+        if (lower.startsWith('apprentissage :') && (lower.includes('sombre') || lower.includes('douleur') || lower.includes('désespoir'))) {
+            return 'apprentissage-double';
+        }
+        
+        // Default: Use standard rules
+        return 'standard';
+    }
+    
+    // Base slug generation for NORMALIZED URLs (handles apostrophes with hyphens for prepositions)
+    function toSlugBaseNormalized(text) {
+        let result = text.toLowerCase();
+        const pattern = detectApostrophePattern(text);
         
         result = result
-            .toLowerCase()
-            .replace(/,/g, "")                       // Remove commas completely (keeps words together)
+            .replace(/,/g, "")                       // Remove commas completely
+            .replace(/!/g, "");                      // Remove exclamation marks
+        
+        // Handle Apprentissage based on pattern
+        if (pattern === 'apprentissage-double') {
+            result = result.replace(/^apprentissage : /g, "apprentissage--");  // DOUBLE hyphen for dark quests
+        } else {
+            result = result.replace(/^apprentissage : /g, "apprentissage-");   // SINGLE hyphen for others
+        }
+        
+        result = result
+            .replace(/ : /g, "--")                    // " : " → double hyphen
+            .replace(/:/g, "-");                      // Remaining colons → single hyphen
+        
+        // Handle apostrophes based on detected pattern
+        if (pattern === 'keep-all-hyphens') {
+            // Keep hyphens for ALL apostrophes
+            result = result
+                .replace(/\bc'est\b/g, "cest")        // Exception: "c'est" → "cest"
+                .replace(/\bp'ti\b/g, "pti")          // Exception: "p'ti" → "pti"
+                .replace(/l'/g, "l-")                 // ALL "l'" → "l-"
+                .replace(/d'/g, "d-")                 // ALL "d'" → "d-"
+                .replace(/m'/g, "m-")                 // ALL "m'" → "m-"
+                .replace(/n'/g, "n-")                 // ALL "n'" → "n-"
+                .replace(/'/g, "");                   // Remove remaining apostrophes
+        } else if (pattern === 'keep-d-hyphen') {
+            // Keep hyphen for d' only
+            result = result
+                .replace(/\bc'est\b/g, "cest")
+                .replace(/\bp'ti\b/g, "pti")
+                .replace(/^l'/g, "l-")                // "l'" at START → "l-"
+                .replace(/ de l'/g, " de l-")         // " de l'" → " de l-"
+                .replace(/ à l'/g, " a l-")           // " à l'" → " a l-"
+                .replace(/ l'/g, " l")                // Other " l'" → " l"
+                .replace(/d'/g, "d-")                 // ALL "d'" → "d-" (KEEP HYPHEN)
+                .replace(/n'/g, "n")
+                .replace(/'/g, "");
+        } else {
+            // Standard rules
+            result = result
+                .replace(/\bc'est\b/g, "cest")
+                .replace(/\bp'ti\b/g, "pti")
+                .replace(/^l'/g, "l-")                // "l'" at START → "l-"
+                .replace(/ de l'/g, " de l-")         // " de l'" → " de l-"
+                .replace(/ à l'/g, " a l-")           // " à l'" → " a l-"
+                .replace(/ l'/g, " l")                // Other " l'" → " l"
+                .replace(/\bd'/g, "d")                // "d'" → "d"
+                .replace(/n'/g, "n")
+                .replace(/'/g, "");
+        }
+        
+        return result;
+    }
+    
+    // Base slug generation for ENTITY-ENCODED URLs (removes ALL l' without hyphens)
+    function toSlugBaseEntity(text) {
+        let result = text.toLowerCase();
+        const pattern = detectApostrophePattern(text);
+        
+        result = result
+            .replace(/,/g, "")                       // Remove commas completely
+            .replace(/!/g, "");                      // Remove exclamation marks
+        
+        // Handle Apprentissage based on pattern (same as normalized)
+        if (pattern === 'apprentissage-double') {
+            result = result.replace(/^apprentissage : /g, "apprentissage--");  // DOUBLE hyphen
+        } else {
+            result = result.replace(/^apprentissage : /g, "apprentissage-");   // SINGLE hyphen
+        }
+        
+        result = result
+            .replace(/ : /g, "--")                    // " : " → double hyphen
+            .replace(/:/g, "-")                       // Remaining colons → single hyphen
             .replace(/\bc'est\b/g, "cest")            // Special case: "c'est" becomes "cest"
             .replace(/\bp'ti\b/g, "pti")              // Special case: "p'ti" becomes "pti"
-            .replace(/\bl'/g, "l")                     // Remove "L'" apostrophe completely (no space)
-            .replace(/\bd'/g, "d ")                    // Remove "d'" apostrophe (special case for "d'")
-            .replace(/['']/g, " ");                    // Replace other apostrophes with spaces for contractions
-        console.log(`🔍 DEBUG after apostrophe replacement: "${result}"`);
+            .replace(/l'/g, "l")                      // ALL "l'" → "l" (NO hyphen for entity encoding)
+            .replace(/\bd'/g, "d")                    // "d'" → "d"
+            .replace(/n'/g, "n")                      // "n'" → "n"
+            .replace(/'/g, "");                       // Remove remaining apostrophes
         
+        return result;
+    }
+    
+    // Finalize slug (handles special chars, spaces, hyphens)
+    function finalizeSlug(result) {
         result = result
-            .replace(/[?]/g, " ");                    // Replace question marks with spaces to preserve hyphen pattern
-        console.log(`🔍 DEBUG after question mark replacement: "${result}"`);
+            .replace(/[?]/g, " ")                    // Replace question marks with spaces
+            .replace(/[^a-z0-9\s-]+/g, "")           // Keep hyphens, remove other special chars
+            .replace(/   /g, "--")                   // Triple spaces to double hyphens
+            .replace(/\s+/g, "-")                    // Remaining spaces to single hyphens
+            .replace(/-{3,}/g, "--")                 // Collapse 3+ hyphens to double
+            .replace(/^-+|-+$/g, "");                // Remove leading/trailing hyphens
         
-        result = result
-            .replace(/[^a-z0-9\s-]+/g, "");           // Keep hyphens, remove other special chars
-        console.log(`🔍 DEBUG after special chars removal: "${result}"`);
+        return result;
+    }
+    
+    // Generate normalized slug (accents → plain characters)
+    function toSlugNormalized(text) {
+        console.log(`🔍 Generating NORMALIZED slug for: "${text}"`);
         
-        result = result
-            .replace(/   /g, "--")                   // Triple spaces to double hyphens (question mark pattern)
-            .replace(/\s+/g, "-");                   // Remaining spaces to single hyphens
-        console.log(`🔍 DEBUG after spaces to hyphens: "${result}"`);
+        let result = toSlugBaseNormalized(text);
         
+        // Normalize ALL accents to plain characters
         result = result
-            .replace(/-{4,}/g, "---");                // Collapse 4+ hyphens to triple, preserve triple and double
-        console.log(`🔍 DEBUG after hyphen collapse: "${result}"`);
+            .replace(/Œ|œ/g, "oe")
+            .replace(/É|é/g, "e")
+            .replace(/È|è/g, "e")
+            .replace(/Ê|ê/g, "e")
+            .replace(/Ë|ë/g, "e")
+            .replace(/À|à/g, "a")
+            .replace(/Â|â/g, "a")
+            .replace(/Ä|ä/g, "a")
+            .replace(/Î|î/g, "i")
+            .replace(/Ï|ï/g, "i")
+            .replace(/Ô|ô/g, "o")
+            .replace(/Ö|ö/g, "o")
+            .replace(/Ù|ù/g, "u")
+            .replace(/Û|û/g, "u")
+            .replace(/Ü|ü/g, "u")
+            .replace(/Ç|ç/g, "c");
         
+        result = finalizeSlug(result);
+        console.log(`✅ Normalized slug: "${result}"`);
+        
+        return result;
+    }
+    
+    // Generate entity-encoded slug (accents → HTML entities)
+    function toSlugEntity(text) {
+        console.log(`🔍 Generating ENTITY-ENCODED slug for: "${text}"`);
+        
+        let result = toSlugBaseEntity(text);
+        
+        // Entity-encode ALL accents
         result = result
-            .replace(/^-+|-+$/g, "");                 // Remove leading/trailing hyphens
-        console.log(`🔍 DEBUG final result: "${result}"`);
+            .replace(/Œ|œ/g, "oelig")
+            .replace(/É|é/g, "eacute")
+            .replace(/È|è/g, "egrave")
+            .replace(/Ê|ê/g, "ecirc")
+            .replace(/Ë|ë/g, "euml")
+            .replace(/À|à/g, "agrave")
+            .replace(/Â|â/g, "acirc")
+            .replace(/Ä|ä/g, "auml")
+            .replace(/Î|î/g, "icirc")
+            .replace(/Ï|ï/g, "iuml")
+            .replace(/Ô|ô/g, "ocirc")
+            .replace(/Ö|ö/g, "ouml")
+            .replace(/Ù|ù/g, "ugrave")
+            .replace(/Û|û/g, "ucirc")
+            .replace(/Ü|ü/g, "uuml")
+            .replace(/Ç|ç/g, "ccedil");
+        
+        result = finalizeSlug(result);
+        console.log(`✅ Entity-encoded slug: "${result}"`);
         
         return result;
     }
 
-    // Generate both URL patterns for fallback testing
-    function generateUrlPatterns(frenchName) {
-        console.log(`🔍 DEBUG generateUrlPatterns input: "${frenchName}"`);
-        const entitySlug = toSlug(frenchName, true);
-        const normalizedSlug = toSlug(frenchName, false);
-        console.log(`🔍 DEBUG entitySlug: "${entitySlug}"`);
-        console.log(`🔍 DEBUG normalizedSlug: "${normalizedSlug}"`);
+    // Detect if text contains French accents
+    function hasAccents(text) {
+        return /[àâäéèêëïîôùûüÿœæçÀÂÄÉÈÊËÏÎÔÙÛÜŸŒÆÇ]/.test(text);
+    }
+    
+    // Generate both URL variants (normalized and entity-encoded)
+    function generateUrlVariants(frenchName) {
+        // Check for hardcoded exception first
+        const exception = getUrlException(frenchName);
+        if (exception) {
+            const url = `https://www.dofuspourlesnoobs.com/${exception}.html`;
+            return {
+                primary: url,
+                fallback: url  // Same URL for both since we know the exact format
+            };
+        }
         
-        return [
-            `https://www.dofuspourlesnoobs.com/${entitySlug}.html`,
-            `https://www.dofuspourlesnoobs.com/${normalizedSlug}.html`
-        ];
+        // Otherwise use pattern detection
+        console.log(`🎯 Generating URL variants for: "${frenchName}"`);
+        
+        const normalizedSlug = toSlugNormalized(frenchName);
+        const entitySlug = toSlugEntity(frenchName);
+        
+        const normalizedUrl = `https://www.dofuspourlesnoobs.com/${normalizedSlug}.html`;
+        const entityUrl = `https://www.dofuspourlesnoobs.com/${entitySlug}.html`;
+        
+        // Smart priority logic:
+        // 1. Apprentissage quests generally use normalized URLs (except dark-themed with entity encoding)
+        // 2. Other quests with accents try entity-encoded first
+        // 3. Quests without accents try normalized first
+        
+        const questHasAccents = hasAccents(frenchName);
+        const isApprentissage = frenchName.toLowerCase().startsWith('apprentissage');
+        
+        // Apprentissage quests prefer normalized (accents removed)
+        if (isApprentissage) {
+            console.log(`🎓 Apprentissage quest - using normalized first`);
+            console.log(`📋 Primary URL (normalized): ${normalizedUrl}`);
+            console.log(`📋 Fallback URL (entity): ${entityUrl}`);
+            return {
+                primary: normalizedUrl,
+                fallback: entityUrl,
+                frenchName: frenchName
+            };
+        }
+        // Other quests with accents try entity-encoded first
+        else if (questHasAccents) {
+            console.log(`✨ Quest has accents - trying entity-encoded first`);
+            console.log(`📋 Primary URL (entity): ${entityUrl}`);
+            console.log(`📋 Fallback URL (normalized): ${normalizedUrl}`);
+            return {
+                primary: entityUrl,
+                fallback: normalizedUrl,
+                frenchName: frenchName
+            };
+        }
+        // Quests without accents use normalized
+        else {
+            console.log(`📋 Primary URL (normalized): ${normalizedUrl}`);
+            console.log(`📋 Fallback URL (entity): ${entityUrl}`);
+            return {
+                primary: normalizedUrl,
+                fallback: entityUrl,
+                frenchName: frenchName
+            };
+        }
     }
 
-    // Comprehensive test function for accent scenarios (development only)
-    function testAccentScenarios() {
-        const testCases = [
-            // Common French accents in Dofus content
-            { input: "Épreuve du Zobal", expected: "epreuve-du-zobal" },
-            { input: "Crâne du Craqueleur", expected: "crane-du-craqueleur" },
-            { input: "Forêt de la Mist", expected: "foret-de-la-mist" },
-            { input: "Maître Pandawa", expected: "maitre-pandawa" },
-            { input: "Princesse Radegonde", expected: "princesse-radegonde" },
-            { input: "Épée du Roi", expected: "epee-du-roi" },
-            { input: "Fée des Bois", expected: "fee-des-bois" },
-            { input: "Montagne des Craqueleurs", expected: "montagne-des-craqueleurs" },
-            
-            // Multiple accents
-            { input: "L'Épreuve des Bworks", expected: "lepreuve-des-bworks" },
-            { input: "Crâne et Épée", expected: "crane-et-epee" },
-            { input: "Forêt enchantée", expected: "foret-enchantee" },
-            { input: "Maîtrise des Éléments", expected: "maitrise-des-elements" },
-            
-            // Complex apostrophe + accent combinations
-            { input: "L'Œil de Forfut", expected: "loeil-de-forfut" },
-            { input: "L'Épée de la vérité", expected: "leepee-de-la-verite" },
-            { input: "D'Émeraude", expected: "demeraude" },
-            
-            // Edge cases
-            { input: "  É  è  ê  ë  à  â  ä  î  ï  ô  ö  ù  û  ü  ç  ", expected: "e-e-e-e-a-a-a-i-i-o-o-u-u-u-c" },
-            { input: "---Épreuve---", expected: "epreuve" },
-            { input: "Accents!@#$%^&*()Test", expected: "accentstest" }
-        ];
+    // Create button with fallback URL support
+    function createButtonWithFallback(urlVariants) {
+        console.log(`🚀 createButtonWithFallback called for: "${urlVariants.frenchName}"`);
+        console.log(`📌 Primary URL: ${urlVariants.primary}`);
+        console.log(`🔄 Fallback URL: ${urlVariants.fallback}`);
         
-        console.log("=== Testing Accent Scenarios ===");
-        testCases.forEach((testCase, index) => {
-            const result = toSlug(testCase.input);
-            const passed = result === testCase.expected;
-            console.log(`${index + 1}. ${testCase.input}`);
-            console.log(`   Expected: ${testCase.expected}`);
-            console.log(`   Got:      ${result}`);
-            console.log(`   Status:   ${passed ? '✅ PASS' : '❌ FAIL'}`);
-            console.log('');
+        // Prevent multiple button creation attempts
+        if (isCreatingButton) {
+            console.log("⏸️ Button creation already in progress, skipping");
+            return;
+        }
+        
+        // Check current popup visibility state before creating button
+        browserAPI.storage.sync.get(['popupVisible'], function(result) {
+            const isVisible = result.popupVisible === true;
+            
+            if (!isVisible) {
+                console.log("❌ Extension disabled, not creating button");
+                console.log("🔓 Button creation lock released (disabled)");
+                isCreatingButton = false;
+                return;
+            }
+            
+            isCreatingButton = true;
+            console.log("🔒 Button creation lock engaged");
+            
+            const existingBtn = document.getElementById("dofus-quest-linker-btn");
+            if (existingBtn) existingBtn.remove();
+            
+            // Track which URL to try (starts with primary)
+            let currentUrlIndex = 0;
+            const urls = [urlVariants.primary, urlVariants.fallback];
+            
+            // Create container with correct original styling
+            const container = document.createElement("div");
+            container.id = "dpln-button-main";
+            container.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 999999;
+                background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e20 100%);
+                border: 2px solid #d4af37;
+                border-radius: 12px;
+                padding: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2);
+                cursor: pointer;
+                font-family: 'Trebuchet MS', Arial, sans-serif;
+                transition: all 0.3s ease;
+                max-width: 240px;
+            `;
+            
+            // Create logo and text container
+            const content = document.createElement("div");
+            content.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+                
+            // Add logo
+            const logo = document.createElement("img");
+            logo.src = browserAPI.runtime.getURL("dofusquestimg.png");
+            logo.alt = "DofusPourLesNoobs";
+            logo.style.cssText = `
+                width: 52px;
+                height: 52px;
+                border-radius: 4px;
+            `;
+                
+            // Add text
+            const text = document.createElement("div");
+            
+            // Create title element
+            const title = document.createElement("div");
+            title.style.cssText = "color: #d4af37; font-size: 11px; font-weight: bold; margin-bottom: 2px;";
+            title.textContent = "DOFUS POUR LES NOOBS";
+            
+            // Create subtitle element
+            const subtitle = document.createElement("div");
+            subtitle.style.cssText = "color: #ffffff; font-size: 12px; opacity: 0.9;";
+            subtitle.textContent = 'Open Guide';
+                
+            // Append elements
+            text.appendChild(title);
+            text.appendChild(subtitle);
+            
+            content.appendChild(logo);
+            content.appendChild(text);
+            container.appendChild(content);
+            
+            // Hover effects
+            container.onmouseover = () => {
+                container.style.transform = 'translateY(-2px)';
+                container.style.boxShadow = '0 6px 16px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.4)';
+                container.style.borderColor = '#ffd700';
+            };
+                
+            container.onmouseout = () => {
+                container.style.transform = 'translateY(0)';
+                container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2)';
+                container.style.borderColor = '#d4af37';
+            };
+                
+            // Add click handler with fallback support
+            container.onclick = () => {
+                const urlToOpen = urls[currentUrlIndex];
+                console.log(`🔗 Opening URL: ${urlToOpen}`);
+                console.log(`💡 If this doesn't work, the fallback URL is: ${urls[1 - currentUrlIndex]}`);
+                window.open(urlToOpen, "_blank");
+            };
+            
+            // Add right-click handler to try fallback URL
+            container.oncontextmenu = (e) => {
+                e.preventDefault();
+                currentUrlIndex = 1 - currentUrlIndex; // Toggle between 0 and 1
+                const nextUrl = urls[currentUrlIndex];
+                console.log(`🔄 Switched to ${currentUrlIndex === 0 ? 'PRIMARY' : 'FALLBACK'} URL: ${nextUrl}`);
+                subtitle.textContent = currentUrlIndex === 0 ? 'Open Guide' : 'Try Fallback';
+                subtitle.style.color = currentUrlIndex === 0 ? '#ffffff' : '#ffa500';
+            };
+                
+            // Add to page
+            document.body.appendChild(container);
+            console.log("✅ Button created with fallback support");
+            console.log("💡 Right-click button to switch between primary and fallback URLs");
+            console.log("🔓 Button creation lock released");
+            isCreatingButton = false;
         });
     }
 
@@ -396,134 +876,6 @@
         existingButtons.forEach(button => button.remove());
     }
 
-    // Smart URL selection without CORS testing
-    function testUrlsAndCreateButton(urls, frenchName, isFallback = false) {
-        console.log(`🔍 Smart URL selection for "${frenchName}":`, urls);
-        
-        // Remove any existing buttons first
-        removeExistingButtons();
-        console.log(`🧹 Cleaned up existing buttons`);
-        
-        // Since CORS blocks URL testing, use smart pattern selection with fallback
-        let urlSelection = selectBestUrl(urls, frenchName);
-        console.log(`🎯 SELECTED URL: ${urlSelection.primary}`);
-        createButton(urlSelection.primary, isFallback);
-    }
-    
-    // Universal URL selection with validation and fallback
-    function selectBestUrl(urls, frenchName) {
-        const [entityUrl, normalizedUrl] = urls;
-        
-        // Universal rules for determining when to use entity encoding
-        const shouldUseEntity = analyzeUrlRequirements(frenchName);
-        
-        let primaryUrl = shouldUseEntity ? entityUrl : normalizedUrl;
-        let fallbackUrl = shouldUseEntity ? normalizedUrl : entityUrl;
-        
-        console.log(`🎯 Primary URL selected: ${primaryUrl}`);
-        
-        // Return primary URL with fallback capability
-        return { primary: primaryUrl, fallback: fallbackUrl };
-    }
-    
-    // Universal analysis of URL requirements based on character patterns
-    function analyzeUrlRequirements(frenchName) {
-        console.log(`🔍 DEBUG: Analyzing "${frenchName}"`);
-        
-        // Rule 1: Special characters that always need entity encoding
-        if (/[\u00cf\u00ee\u00cf]/.test(frenchName)) { // Î, î
-            console.log(`🔍 Special character detected: Î/î`);
-            return true;
-        }
-        
-        // Rule 2: Accent patterns that typically need entity encoding
-        const accentCount = (frenchName.match(/[àâäéèêëïîôöùûüç]/gi) || []).length;
-        const uniqueAccents = new Set(frenchName.match(/[àâäéèêëïîôöùûüç]/gi) || []).size;
-        
-        console.log(`🔍 DEBUG: Found ${accentCount} accents, ${uniqueAccents} unique types`);
-        
-        // Multiple different accents usually need entity encoding, but check for exceptions
-        if (accentCount >= 2 && uniqueAccents >= 2) {
-            console.log(`🔍 Multiple accent types detected: ${accentCount} accents, ${uniqueAccents} unique types`);
-            
-            // Exception: Some multiple accent patterns work better with normalized URLs
-            const normalizedExceptions = [
-                /détour.*rêve/,  // "Au détour d'un rêve perdu" works normalized
-                /d'ébène/,      // "Noir d'ébène" works normalized
-                /pouvoir.*érydique/,  // Exception patterns that work normalized
-            ];
-            
-            if (normalizedExceptions.some(pattern => pattern.test(frenchName))) {
-                console.log(`🔍 Multiple accent pattern but normalized works better for this case`);
-                return false;
-            }
-            
-            return true;
-        }
-        
-        // Single é or è accent often needs entity encoding, but check for exceptions
-        if (accentCount === 1 && (frenchName.includes('é') || frenchName.includes('è'))) {
-            const accentType = frenchName.includes('é') ? 'é' : 'è';
-            console.log(`🔍 Single ${accentType} accent detected - may need entity encoding`);
-            
-            // Exception: Some single accent patterns work better with normalized URLs
-            const singleAccentExceptions = [
-                /éveil/,        // "Quand l'éveil n'est qu'un songe" works normalized
-                /pouvoir/,      // Some pouvoir patterns work normalized
-            ];
-            
-            if (singleAccentExceptions.some(pattern => pattern.test(frenchName))) {
-                console.log(`🔍 Single ${accentType} pattern but normalized works better for this case`);
-                return false;
-            }
-            
-            // è accent typically needs entity encoding
-            if (frenchName.includes('è')) {
-                console.log(`🔍 Single è accent - entity encoding required`);
-                return true;
-            }
-            
-            return true;
-        }
-        
-        // Rule 3: Specific accent combinations that historically need entity encoding
-        // Only trigger if BOTH characters are present in the string
-        if (frenchName.includes('à') && frenchName.includes('é')) {
-            console.log(`🔍 Complex accent pattern detected: à + é`);
-            return true;
-        }
-        if (frenchName.includes('è') && frenchName.includes('ê')) {
-            console.log(`🔍 Complex accent pattern detected: è + ê`);
-            return true;
-        }
-        if (frenchName.includes('â') && frenchName.includes('ä')) {
-            console.log(`🔍 Complex accent pattern detected: â + ä`);
-            return true;
-        }
-        
-        // Rule 4: Content types that typically need entity encoding
-        const entityContentTypes = [
-            'nowel',        // Christmas content uses entity encoding
-            'totankama',    // Ancient/puzzle content
-            'épreuve',      // Trial/quest content
-        ];
-        
-        if (entityContentTypes.some(type => frenchName.toLowerCase().includes(type))) {
-            console.log(`🔍 Content type requiring entity encoding detected: ${entityContentTypes.find(type => frenchName.toLowerCase().includes(type))}`);
-            return true;
-        }
-        
-        // Rule 5: Special punctuation patterns that need entity encoding
-        // Only question marks with spacing patterns need entity encoding (not colons, periods, etc.)
-        if (/[!?]\s/.test(frenchName) || /\s[!?]/.test(frenchName)) {
-            console.log(`🔍 Special punctuation pattern detected (question mark/exclamation)`);
-            return true;
-        }
-        
-        // Default: normalized URLs work for most content
-        console.log(`🔍 Standard pattern detected - normalized URL should work`);
-        return false;
-    }
 
     function createFallbackButton() {
         // Enhanced approach: Try API first, then generate direct URLs for missing content
@@ -548,12 +900,9 @@
                         console.log(`✅ Found French name in ${contentType}: ${foundFrenchName}`);
                         
                         // Create button with the actual French name
-                        const [entityUrl, normalizedUrl] = generateUrlPatterns(foundFrenchName);
-                        const shouldUseEntity = analyzeUrlRequirements(foundFrenchName);
-                        const selectedUrl = shouldUseEntity ? entityUrl : normalizedUrl;
-                        
-                        console.log(`🎯 Validated fallback URL: ${selectedUrl}`);
-                        createButton(selectedUrl, true);
+                        const urlVariants = generateUrlVariants(foundFrenchName);
+                        console.log(`🎯 Validated fallback URLs`);
+                        createButtonWithFallback(urlVariants);
                         return;
                     }
                     
@@ -566,21 +915,16 @@
                         const likelyFrenchNames = generateLikelyFrenchNames(englishName);
                         console.log(`🔍 Trying ${likelyFrenchNames.length} pattern-based French names`);
                         
-                        // Only create buttons for high-confidence pattern matches
-                        // Skip generic word-by-word translations that are likely to be wrong
+                        // Universal approach: Create buttons for any non-English pattern matches
                         const highConfidenceMatch = likelyFrenchNames.find(name => 
                             name !== englishName && // Not the original English name
-                            !name.includes("Book") && // Skip book patterns (often wrong)
-                            (name.includes("Quête") || name.includes("Arrivée") || name.includes("Conseil")) // Known good patterns
+                            name.length > 3 // Skip very short patterns
                         );
                         
                         if (highConfidenceMatch) {
-                            const [entityUrl, normalizedUrl] = generateUrlPatterns(highConfidenceMatch);
-                            const shouldUseEntity = analyzeUrlRequirements(highConfidenceMatch);
-                            const selectedUrl = shouldUseEntity ? entityUrl : normalizedUrl;
-                            
-                            console.log(`🎯 High-confidence fallback URL: ${selectedUrl}`);
-                            createButton(selectedUrl, true);
+                            const urlVariants = generateUrlVariants(highConfidenceMatch);
+                            console.log(`🎯 High-confidence fallback URLs`);
+                            createButtonWithFallback(urlVariants);
                         } else {
                             console.log(`🚫 No high-confidence pattern match for: ${englishName}`);
                             console.log(`💡 Skipping button creation to avoid broken URLs`);
@@ -601,62 +945,10 @@
     function generateLikelyFrenchNames(englishName) {
         const frenchNames = [];
         
-        // Universal patterns first - always try these before any exceptions
-        const phrasePatterns = {
-            "Discreet Arrival": "Arrivée discrète",
-            "Class Quest": "Quête de classe",
-            "Devotion Quest": "Quête de dévotion",
-            "Astrubian Rumours": "Rumeurs astrubiennes",
-            "Life After Death": "La vie après la mort",
-            "From Nhin to Nhin": "De Nhin à Nhin"
-        };
-        
-        // Check for universal phrase patterns first
-        if (phrasePatterns[englishName]) {
-            frenchNames.push(phrasePatterns[englishName]);
-        }
-        
-        // Common word patterns for individual word replacement
-        const wordPatterns = {
-            "Quest": "Quête",
-            "Arrival": "Arrivée",
-            "Discreet": "Discrète", 
-            "Remarkable": "Remarquable",
-            "Advice": "Conseil",
-            "Class": "Classe",
-            "Devotion": "Dévotion",
-            "Life": "Vie",
-            "Death": "Mort",
-            "After": "après",
-            "Rumours": "Rumeurs",
-            "Astrubian": "Astrubiennes",
-            "From": "De",
-            "To": "à",
-            "and": "et",
-            "the": "la",
-            "The": "La"
-        };
-        
-        // Generate word-by-word translation if no phrase match
-        let generated = englishName;
-        Object.entries(wordPatterns).forEach(([en, fr]) => {
-            generated = generated.replace(new RegExp(en, 'g'), fr);
-        });
-        
-        if (generated !== englishName && !frenchNames.includes(generated)) {
-            frenchNames.push(generated);
-        }
-        
-        // Data inconsistency exceptions - ONLY as last resort after universal patterns fail
-        // Minimal exceptions for cases where names are completely unrelated, not translations
-        const dataInconsistencies = {
-            "Remarkyble Advice": "L'avis d'Archie m'aide"
-        };
-        
-        // Add exceptions only if no universal patterns matched
-        if (frenchNames.length === 0 && dataInconsistencies[englishName]) {
-            frenchNames.push(dataInconsistencies[englishName]);
-        }
+                
+                
+        // Universal approach: Only use original English name as fallback
+        // No hardcoded exceptions - rely on API and universal patterns
         
         // Add original as final fallback
         if (!frenchNames.includes(englishName)) {
@@ -666,47 +958,6 @@
         return frenchNames;
     }
     
-    // Comprehensive URL pattern testing
-    console.log("=== URL Pattern Testing ===");
-    
-    const urlTestCases = [
-        // Known working cases
-        { french: "Un pouvoir mérydique", expectedNormalized: "un-pouvoir-merydique", expectedEntity: "un-pouvoir-meacuterydique" },
-        { french: "L'empire de la jetée", expectedNormalized: "lempire-de-la-jetee", expectedEntity: "lempire-de-la-jeteacutee" },
-        { french: "Épreuve de Draegnerys", expectedNormalized: "epreuve-de-draegnerys", expectedEntity: "epreuve-de-draegnerys" },
-        
-        // Common French accents
-        { french: "Épreuve du Zobal", expectedNormalized: "epreuve-du-zobal", expectedEntity: "epreuve-du-zobal" },
-        { french: "Crâne du Craqueleur", expectedNormalized: "crane-du-craqueleur", expectedEntity: "crane-du-craqueleur" },
-        { french: "Forêt de la Mist", expectedNormalized: "foret-de-la-mist", expectedEntity: "foret-de-la-mist" },
-        { french: "Maître Pandawa", expectedNormalized: "maitre-pandawa", expectedEntity: "maitre-pandawa" },
-        { french: "Princesse Radegonde", expectedNormalized: "princesse-radegonde", expectedEntity: "princesse-radegonde" },
-        { french: "Épée du Roi", expectedNormalized: "epee-du-roi", expectedEntity: "epee-du-roi" },
-        { french: "Fée des Bois", expectedNormalized: "fee-des-bois", expectedEntity: "fee-des-bois" },
-        
-        // Complex cases
-        { french: "L'Œil de Forfut", expectedNormalized: "loeil-de-forfut", expectedEntity: "loeil-de-forfut" },
-        { french: "Mise à l'épreuve", expectedNormalized: "mise-a-lepreuve", expectedEntity: "mise-agrave-leacutepreuve" },
-        
-        // No accents (should be same)
-        { french: "Minotoror", expectedNormalized: "minotoror", expectedEntity: "minotoror" },
-        { french: "Dragon Pig", expectedNormalized: "dragon-pig", expectedEntity: "dragon-pig" }
-    ];
-    
-    urlTestCases.forEach((testCase, index) => {
-        const normalizedResult = toSlug(testCase.french, false);
-        const entityResult = toSlug(testCase.french, true);
-        
-        console.log(`${index + 1}. "${testCase.french}"`);
-        console.log(`   Normalized: "${normalizedResult}" ${normalizedResult === testCase.expectedNormalized ? '✅' : '❌'}`);
-        console.log(`   Entity:     "${entityResult}" ${entityResult === testCase.expectedEntity ? '✅' : '❌'}`);
-        console.log('');
-    });
-    
-    console.log("=== URL Pattern Summary ===");
-    console.log("✅ Normalized URLs work for: Most French content (90%+)");  
-    console.log("✅ Entity URLs work for: Special cases like 'Return of the Jetty'");
-    console.log("❌ Entity URLs fail for: Most content (over-encoded)");
-    console.log("🎯 Current strategy: Try normalized first, fallback to entity");
+    // Universal URL generation system - no hardcoded test cases needed
     
     })();
