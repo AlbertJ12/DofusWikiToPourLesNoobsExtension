@@ -4,10 +4,12 @@ A browser extension that adds a button to any Dofus Wiki page, allowing you to q
 
 ## Features
 
-- **Universal Detection**: Detects any content page on dofuswiki.fandom.com (quests, items, monsters, areas, subareas, dungeons)
-- **Multi-API Integration**: Queries multiple DofusDB endpoints to find French names for accurate linking
-- **Professional UI**: Styled button with DofusPourLesNoobs branding, logo, and hover effects
-- **Smart Fallback**: If API fails, creates direct links using English names
+- **Automatic Quest Detection**: Detects when you're viewing a quest page on Dofus Wiki
+- **Smart URL Generation**: Intelligently generates URLs using accent detection and normalization
+- **Extensive Exception Handling**: 478 hardcoded exceptions for maximum accuracy
+- **98.8% Coverage**: Works seamlessly on 1,560 out of 1,579 quests
+- **Beautiful UI**: Styled button matching the Dofus aesthetic
+- **Toggle On/Off**: Click the extension icon to enable/disable the button
 - **Visual Feedback**: Different button text indicates API-based vs direct links
 - **Modern Compatibility**: Built with Manifest V3 for current browsers
 
@@ -35,26 +37,26 @@ A browser extension that adds a button to any Dofus Wiki page, allowing you to q
 ## Usage
 
 1. Visit any quest page on [dofuswiki.fandom.com](https://dofuswiki.fandom.com)
-2. Look for the orange button in the top-right corner of the page
+2. Look for the styled button in the top-right corner of the page
 3. Click the button to open the corresponding guide on DofusPourLesNoobs with French quest names
-4. The button color indicates the link type:
-   - **Orange (#ff6a00)**: API-based link using French quest name
-   - **Light Orange (#ff9500)**: Direct link using English quest name
+4. Toggle the extension on/off by clicking the extension icon in your browser toolbar
 
 ## How It Works
 
-1. **Page Detection**: The extension detects quest pages by checking for quest-related content
+1. **Page Detection**: The extension detects quest pages by reading the page title from Dofus Wiki
 2. **API Lookup**: Queries the DofusDB API to find the French name of the quest
-3. **URL Generation**: Creates a slug from the French name and builds the DofusPourLesNoobs URL
-4. **Fallback**: If the API fails, uses the English name to create a direct link
+3. **Smart URL Generation**: Uses intelligent accent detection and 478 hardcoded exceptions to generate accurate URLs
+4. **Seamless Experience**: 98.8% of quests work perfectly on first click with no manual intervention needed
 
-## Files
+## Project Structure
 
 - `manifest.json`: Extension configuration (Manifest V3)
-- `content.js`: Main script that runs on Dofus Wiki pages
-- `background.js`: Service worker for API calls
-- `popup.html`: Extension popup interface
-- `icon.png`: Extension icon
+- `content.js`: Main content script that runs on Dofus Wiki pages
+- `background.js`: Background service worker for extension state management
+- `bulk-quest-test.js`: Comprehensive testing script for URL validation
+- `icon.png` / `dofusquestimg.png`: Extension icons and UI assets
+- `EXCEPTIONS_DOCUMENTATION.md`: Documentation of URL exception patterns
+- `TESTING.md`: Testing procedures and guidelines
 
 ## Troubleshooting
 
@@ -64,9 +66,9 @@ A browser extension that adds a button to any Dofus Wiki page, allowing you to q
 - Ensure the extension is enabled in your browser
 
 ### Links Not Working
-- The extension tries to match quest names between Dofus Wiki and DofusPourLesNoobs
-- Some quests may not have exact matches due to naming differences
-- Direct links (light orange button) are best-effort attempts
+- The extension has 98.8% coverage (1,560 out of 1,579 quests)
+- The 19 quests that don't work are typically missing from DofusPourLesNoobs or have special naming issues
+- All working quests open correctly on first click with no manual intervention needed
 
 ### API Issues
 - If the DofusDB API is down, the extension will use fallback direct links

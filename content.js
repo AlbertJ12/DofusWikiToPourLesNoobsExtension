@@ -363,6 +363,292 @@
         "un pouvoir mérydique": "un-pouvoir-merydique",
         "l'anneau de tot": "lanneau-de-tot",
         "série animalière": "serie-animaliere",
+        "comment mettre un requin en bière": "comment-mettre-un-requin-en-biere",
+        "on recherche padgref demoël": "on-recherche-padgref-demoel",
+        "on recherche fouduglen l'écureuil": "on-recherche-fouduglen-l-ecureuil",
+        "apprentissage : écuyer": "apprentissage-ecuyer",
+        "apprentissage : apprenti éclairé": "apprentissage-apprenti-eclaire",
+        "on recherche zatoïshwan": "on-recherche-zatoishwan",
+        "apprentissage : adepte des écrits": "apprentissage-adepte-des-ecrits",
+        "apprentissage : chasseur de renégats": "apprentissage-chasseur-de-renegats",
+        "de la viande de dragodinde pour la tablée d'allister": "de-la-viande-de-dragodinde-pour-la-tablee-d-allister",
+        "piétine titine": "pietine-titine",
+        "visite non guidée": "visite-non-guidee",
+        "des fleurs épineuses": "des-fleurs-epineuses",
+        "le maître des clefs": "le-maitre-des-clefs",
+        "les sbires du maître": "les-sbires-du-maitre",
+        "un juge hystérique": "un-juge-hysterique",
+        "ça est frugal, une fois": "ca-est-frugal-une-fois",
+        "info pour un vrai traître": "info-pour-un-vrai-traitre",
+        "usuwpation d'identité": "usuwpation-d-identite",
+        "à roublard, roublard et demi": "a-roublard-roublard-et-demi",
+        "trouble-fête": "trouble-fete",
+        "bouc à misère": "bouc-a-misere",
+        "flagrant délire": "flagrant-delire",
+        "les kamas résolvent tout": "les-kamas-resolvent-tout",
+        "l'équipe ment": "l-equipe-ment",
+        "ambition ambigüe": "ambition-ambigue",
+        "trâknar": "traknar",
+        "attaque à retardement": "attaque-a-retardement",
+        "une rumeur intéressante": "une-rumeur-interessante",
+        "investigations à moon": "investigations-a-moon",
+        "manière douce": "maniere-douce",
+        "un coupable idéal": "un-coupable-ideal",
+        "de drôles de témoins": "de-droles-de-temoins",
+        "esprit, es-tu là ?": "esprit-es-tu-la",
+        "ingérence en amakna": "ingerence-en-amakna",
+        "apprentissage : maître des parchemins": "apprentissage-maitre-des-parchemins",
+        "apprentissage : assassin suprême": "apprentissage-assassin-supreme",
+        "la mémoire en lambeaux": "la-memoire-en-lambeaux",
+        "pense-bête": "pense-bete",
+        "l'éclat de l'aube": "l-eclat-de-l-aube",
+        "espèce menacée": "espece-menacee",
+        "on recherche fantômayte": "on-recherche-fantomayte",
+        "on recherche vengeuse masquée": "on-recherche-vengeuse-masquee",
+        "rose à lys, rose à lys, oh !": "rose-a-lys-rose-a-lys-oh",
+        "l'ombre et la glace": "lombre-et-la-glace",
+        "à la recherche de dan lavy": "a-la-recherche-de-dan-lavy",
+        "à qui profite le boufmouth": "a-qui-profite-le-boufmouth",
+        "l'abominable yech'ti": "labominable-yechti",
+        "septième postage": "septieme-postage",
+        "huitième postage": "huitieme-postage",
+        "neuvième postage": "neuvieme-postage",
+        "dixième postage": "dixieme-postage",
+        "douzième postage": "douzieme-postage",
+        "fantômes contre fantômes": "fantomes-contre-fantomes",
+        "braquage à la roublard": "braquage-a-la-roublard",
+        "la destinée": "la-destinee",
+        "l'aventure de la terre": "laventure-de-la-terre",
+        "dévotion à crâ": "devotion-a-cra",
+        "dévotion à ecaflip": "devotion-a-ecaflip",
+        "dévotion à eniripsa": "devotion-a-eniripsa",
+        "dévotion à enutrof": "devotion-a-enutrof",
+        "dévotion à féca": "devotion-a-feca",
+        "dévotion à iop": "devotion-a-iop",
+        "dévotion à osamodas": "devotion-a-osamodas",
+        "dévotion à pandawa": "devotion-a-pandawa",
+        "dévotion à dralbour": "devotion-a-dralbour",
+        "dévotion à sacrieur": "devotion-a-sacrieur",
+        "dévotion à xélor": "devotion-a-xelor",
+        "à la barbe du roi": "a-la-barbe-du-roi",
+        "des kœurs du tonnerre !": "des-koeurs-du-tonnerre",
+        "l'étrange créature de l'étang bleu": "l-etrange-creature-de-l-etang-bleu",
+        "dévotion à oktapodas": "devotion-a-oktapodas",
+        "pattes aux œufs frais": "pattes-aux-oeufs-frais",
+        "vols à la charrette": "vols-a-la-charrette",
+        "la fête aux tire-fesses": "la-fete-aux-tire-fesses",
+        "contrôles anti-baston": "controles-anti-baston",
+        "mener à la baguette": "mener-a-la-baguette",
+        "on recherche culbutœuf": "on-recherche-culbutoeuf",
+        "la rivalité": "la-rivalite",
+        "troubles à bonta": "troubles-a-bonta",
+        "troubles à brâkmar": "troubles-a-brakmar",
+        "l'ivresse des profondeurs": "livresse-des-profondeurs",
+        "à bas kralab rah": "a-bas-kralab-rah",
+        "l'amour perdu de nabur": "lamour-perdu-de-nabur",
+        "l'art triste": "lart-triste",
+        "prime de lèche-majesté": "prime-de-leche-majeste",
+        "coiffeur de génie": "coiffeur-de-genie",
+        "un œuf pour ecaflip": "un-oeuf-pour-ecaflip",
+        "l'art me ment": "lart-me-ment",
+        "bouchées à la reine": "bouchees-a-la-reine",
+        "sortir de l'ombre": "sortir-de-lombre",
+        "os sitôt dit, aussitôt fait": "os-sitot-dit-aussitot-fait",
+        "on recherche la mouchâme": "on-recherche-la-mouchame",
+        "on recherche pantèroz": "on-recherche-panteroz",
+        "la quête de l'oiseau du temps": "la-quete-de-l-oiseau-du-temps",
+        "dévotion au roi-dieu": "devotion-au-roi-dieu",
+        "l'art de la langue de bois": "lart-de-la-langue-de-bois",
+        "l'ombre et la proie": "lombre-et-la-proie",
+        "dévotion à la balance krosmique": "devotion-a-la-balance-krosmique",
+        "on recherche maître boulet": "on-recherche-maitre-boulet",
+        "l'as du volans": "las-du-volans",
+        "l'arakne de leng": "larakne-de-leng",
+        "gelé à pierre fendre": "gele-a-pierre-fendre",
+        "l'essor de qu'tan": "lessor-de-qutan",
+        "l'habit ne fait pas le moine": "lhabit-ne-fait-pas-le-moine",
+        "ça fait froid dans le dos": "ca-fait-froid-dans-le-dos",
+        "risquer un œil": "risquer-un-oeil",
+        "la gueule de l'enfer": "la-gueule-de-lenfer",
+        "l'affaire pollie perkine": "laffaire-pollie-perkine",
+        "l'odeur devant le seuil": "lodeur-devant-le-seuil",
+        "le héros de sufokia": "le-heros-de-sufokia",
+        "l'effet paula rice": "leffet-paula-rice",
+        "la dernière pierre": "la-derniere-pierre",
+        "les coûts du sort": "les-couts-du-sort",
+        "un remède draconien": "un-remede-draconien",
+        "l'allégorie de la taverne": "l-allegorie-de-la-taverne",
+        "filouterie épicée": "filouterie-epicee",
+        "faune pimentée": "faune-pimentee",
+        "chargement déserté": "chargement-deserte",
+        "l'étoile de la mer": "l-etoile-de-la-mer",
+        "le fou rit et rôde": "le-fou-rit-et-rode",
+        "l'épice rit": "l-epice-rit",
+        "la barrière des langues": "la-barriere-des-langues",
+        "désert de revanche": "desert-de-revanche",
+        "une mine de déterré": "une-mine-de-deterre",
+        "voleurs en série": "voleurs-en-serie",
+        "moins on en a et plus on l'étale": "moins-on-en-a-et-plus-on-letale",
+        "investigation embarquée": "investigation-embarquee",
+        "un problème de serre-ure": "un-probleme-de-serre-ure",
+        "un ver ça va, trop de vers, bonjour les dégâts": "un-ver-ca-va-trop-de-vers-bonjour-les-degats",
+        "le mystère des vers": "le-mystere-des-vers",
+        "perché là-haut": "perche-la-haut",
+        "la cité des truites": "la-cite-des-truites",
+        "dévotion à ouginak": "devotion-a-ouginak",
+        "à armes égales": "a-armes-egales",
+        "nos amies les bêtes": "nos-amies-les-betes",
+        "à la rescousse des magypus": "a-la-rescousse-des-magypus",
+        "trou de mémoire": "trou-de-memoire",
+        "l'entrée des artistes": "l-entree-des-artistes",
+        "le baptême du feu": "le-bapteme-du-feu",
+        "le fléau de burin": "le-fleau-de-burin",
+        "la bête intérieure": "la-bete-interieure",
+        "la prolifération a crû": "la-proliferation-a-cru",
+        "cours forestière": "cours-forestiere",
+        "les goules à zéro": "les-goules-a-zero",
+        "cambriolage à durée déterminée": "cambriolage-a-duree-determinee",
+        "mélodie en sous-sol": "melodie-en-sous-sol",
+        "mieux vaut guérir que mourir": "mieux-vaut-guerir-que-mourir",
+        "le crépuscule des morts-vivants": "le-crepuscule-des-morts-vivants",
+        "un chemin tout tracé": "un-chemin-tout-trace",
+        "à glacer le sang": "a-glacer-le-sang",
+        "lettre à ilyz": "lettre-a-ilyz",
+        "apprentissage : héros légendaire": "apprentissage-heros-legendaire",
+        "apprentissage : maître des illusions": "apprentissage-maitre-des-illusions",
+        "apprentissage : héros de l'apocalypse": "apprentissage-heros-de-l-apocalypse",
+        "apprentissage : maître des ombres": "apprentissage-maitre-des-ombres",
+        "on recherche jérart dupaindur": "on-recherche-jerart-dupaindur",
+        "on recherche le fantôme braïdeur": "on-recherche-le-fantome-braideur",
+        "le piège se referme": "le-piege-se-referme",
+        "la colère des dieux": "la-colere-des-dieux",
+        "au-delà de la côte": "au-dela-de-la-cote",
+        "cœur de pierre": "coeur-de-pierre",
+        "les pierres à feu": "les-pierres-a-feu",
+        "plantes contre trépamorts": "plantes-contre-trepamorts",
+        "le héros de plantes contre trépamorts": "le-heros-de-plantes-contre-trepamorts",
+        "les cœurs livides": "les-coeurs-livides",
+        "craquements de cœur": "craquements-de-coeur",
+        "on marche sur des œufs": "on-marche-sur-des-oeufs",
+        "ça sent le gaz": "ca-sent-le-gaz",
+        "balade en forêt": "balade-en-foret",
+        "la fête de la chocopépite": "la-fete-de-la-chocopepite",
+        "crime et châtiment": "crime-et-chatiment",
+        "ça tombe à l'eau": "ca-tombe-a-l-eau",
+        "déjeuner à la fourchette": "dejeuner-a-la-fourchette",
+        "livraison par intérim": "livraison-par-interim",
+        "golémancien": "golemancien",
+        "le rebelle de la forêt": "le-rebelle-de-la-foret",
+        "de vrais rats de bibliothèque": "de-vrais-rats-de-bibliotheque",
+        "les touffes des héros": "les-touffes-des-heros",
+        "le génie se meut": "le-genie-se-meut",
+        "bûcherons en détresse": "bucherons-en-detresse",
+        "revenons à nos bouftons": "revenons-a-nos-bouftons",
+        "la dernière barbe avant la fin du monde": "la-derniere-barbe-avant-la-fin-du-monde",
+        "lâches de glace": "laches-de-glace",
+        "l'épée du rocher": "l-epee-du-rocher",
+        "le forgeur de légende": "le-forgeur-de-legende",
+        "à la recherche de crocoburio": "a-la-recherche-de-crocoburio",
+        "le creuset de mériana": "le-creuset-de-meriana",
+        "une douloureuse séparation": "une-douloureuse-separation",
+        "l'œuf de crocabulia": "l-oeuf-de-crocabulia",
+        "un nouvel héritier": "un-nouvel-heritier",
+        "le rituel de la bière": "le-rituel-de-la-biere",
+        "chasse au trésor des pirates": "chasse-au-tresor-des-pirates",
+        "un œuf à part": "un-oeuf-a-part",
+        "mystère et œuf au chocolat": "mystere-et-oeuf-au-chocolat",
+        "aux frontières du réel": "aux-frontieres-du-reel",
+        "l'île flottante au chocolat": "l-ile-flottante-au-chocolat",
+        "les aléas de la chocolaterie": "les-aleas-de-la-chocolaterie",
+        "la mélodie du bonheur": "la-melodie-du-bonheur",
+        "et paf, ça fait un shokipik !": "et-paf-ca-fait-un-shokipik",
+        "l'euphorie des léporidés": "l-euphorie-des-leporides",
+        "chasse aux œufs de pwâk": "chasse-aux-oeufs-de-pwak",
+        "des croquants à dévorer": "des-croquants-a-devorer",
+        "la mère des dragoeufs": "la-mere-des-dragoeufs",
+        "les raisons de la colère": "les-raisons-de-la-colere",
+        "plongée dans un bain de sang": "plongee-dans-un-bain-de-sang",
+        "haché parlé": "hache-parle",
+        "cauchemars prémonitoires": "cauchemars-premonitoires",
+        "simulations périlleuses": "simulations-perilleuses",
+        "les œufs oubliés": "les-oeufs-oublies",
+        "une boufette nommée blanquette": "une-boufette-nommee-blanquette",
+        "au-delà de la gloire": "au-dela-de-la-gloire",
+        "le vent se lève": "le-vent-se-leve",
+        "avis de tempête": "avis-de-tempete",
+        "rêves translucides": "reves-translucides",
+        "les quatre volontés": "les-quatre-volontes",
+        "le réveil de pandala": "le-reveil-de-pandala",
+        "à la croisée des mondes": "a-la-croisee-des-mondes",
+        "sous le bois de sa colère": "sous-le-bois-de-sa-colere",
+        "la jetée des enfants perdus": "la-jetee-des-enfants-perdus",
+        "l'équilibre des forces": "l-equilibre-des-forces",
+        "l'épopée du moine pèlerin": "l-epopee-du-moine-pelerin",
+        "une bien étrange prophétie": "une-bien-etrange-prophetie",
+        "infâme pourriture": "infame-pourriture",
+        "où est mon samouraï ?": "ou-est-mon-samourai",
+        "nékinékologie": "nekinekologie",
+        "l'égalité des sexes": "l-egalite-des-sexes",
+        "sombre mystère": "sombre-mystere",
+        "sécurité routière": "securite-routiere",
+        "des lueurs de désespoir": "des-lueurs-de-desespoir",
+        "le réceptacle des dofus": "le-receptacle-des-dofus",
+        "pour que son cœur batte comme des ailes": "pour-que-son-coeur-batte-comme-des-ailes",
+        "toute possession dépossède": "toute-possession-depossede",
+        "le début de la fin": "le-debut-de-la-fin",
+        "un vrai petit garçon": "un-vrai-petit-garcon",
+        "un héritage tourmenté": "un-heritage-tourmente",
+        "les totems de maïmane": "les-totems-de-maimane",
+        "démongraphie galopante": "demongraphie-galopante",
+        "l'appel de la cité blanche": "l-appel-de-la-cite-blanche",
+        "l'appel de la cité sombre": "l-appel-de-la-cite-sombre",
+        "cuisine raffinée": "cuisine-raffinee",
+        "déficience immunitaire": "deficience-immunitaire",
+        "la lumière au bout des égouts": "la-lumiere-au-bout-des-egouts",
+        "ancré dans nos âmes": "ancre-dans-nos-ames",
+        "après lui, le déluge": "apres-lui-le-deluge",
+        "rester planté là": "rester-plante-la",
+        "pas de fumée sans feu": "pas-de-fumee-sans-feu",
+        "la bête au bois dormant": "la-bete-au-bois-dormant",
+        "arrête-la si tu peux": "arrete-la-si-tu-peux",
+        "la campagne hallucinée": "la-campagne-hallucinee",
+        "déboisement vulkain": "deboisement-vulkain",
+        "écrémage vulkain": "ecremage-vulkain",
+        "récolte vulkaine": "recolte-vulkaine",
+        "pêche vulkaine": "peche-vulkaine",
+        "dévotion à la lance originelle": "devotion-a-la-lance-originelle",
+        "un événement inattendu": "un-evenement-inattendu",
+        "l'île maudite": "l-ile-maudite",
+        "la sorcière exilée": "la-sorciere-exilee",
+        "la graine de la révolte": "la-graine-de-la-revolte",
+        "une dernière volonté": "une-derniere-volonte",
+        "les risques du métier": "les-risques-du-metier",
+        "qui nous protège du protecteur ?": "qui-nous-protege-du-protecteur",
+        "l'enfer des altérés": "l-enfer-des-alteres",
+        "au nom du progrès": "au-nom-du-progres",
+        "où est leonzi trool ?": "ou-est-leonzi-trool",
+        "donjon éducatif": "donjon-educatif",
+        "tour du propriétaire": "tour-du-proprietaire",
+        "le métier des aventuriers": "le-metier-des-aventuriers",
+        "préparation au combat": "preparation-au-combat",
+        "ça barde là-haut": "ca-barde-la-haut",
+        "la proie des vérités": "la-proie-des-verites",
+        "trois cœurs, un roi": "trois-coeurs-un-roi",
+        "un problème de taille": "un-probleme-de-taille",
+        "des petites bêtes qui font bzzzbz": "des-petites-betes-qui-font-bzzzbz",
+        "têtes de ponte": "tetes-de-ponte",
+        "dérive insectaire": "derive-insectaire",
+        "une petite démangeaison": "une-petite-demangeaison",
+        "devoir de réserve": "devoir-de-reserve",
+        "un hôte de marque": "un-hote-de-marque",
+        "l'union sacrée": "l-union-sacree",
+        "le roi balafré": "le-roi-balafre",
+        "chasse au trésor archéologique": "chasse-au-tresor-archeologique",
+        "chasse au trésor quotidienne": "chasse-au-tresor-quotidienne",
+        "chasse au trésor de güss": "chasse-au-tresor-de-guss",
+        "chasse au trésor de scheik": "chasse-au-tresor-de-scheik",
+        "chasse au trésor de sad": "chasse-au-tresor-de-sad",
+        "chasse au trésor de milivar": "chasse-au-tresor-de-milivar",
     };
     
     // Check if quest has a hardcoded exception
@@ -718,24 +1004,10 @@
                 container.style.borderColor = '#d4af37';
             };
                 
-            // Add click handler with fallback support
-            let currentUrlIndex = 0;
-            const urls = [urlVariants.primary, urlVariants.fallback];
-            
+            // Add click handler
             container.onclick = () => {
-                const urlToOpen = urls[currentUrlIndex];
-                console.log(`🔗 Opening URL: ${urlToOpen}`);
-                window.open(urlToOpen, "_blank");
-            };
-            
-            // Right-click to switch to fallback URL
-            container.oncontextmenu = (e) => {
-                e.preventDefault();
-                currentUrlIndex = 1 - currentUrlIndex;
-                const nextUrl = urls[currentUrlIndex];
-                console.log(`🔄 Switched to ${currentUrlIndex === 0 ? 'PRIMARY' : 'FALLBACK'} URL: ${nextUrl}`);
-                subtitle.textContent = currentUrlIndex === 0 ? 'Open Guide' : 'Try Fallback';
-                subtitle.style.color = currentUrlIndex === 0 ? '#ffffff' : '#ffa500';
+                console.log(`🔗 Opening URL: ${urlVariants.primary}`);
+                window.open(urlVariants.primary, "_blank");
             };
             
             // Add to page
@@ -745,126 +1017,6 @@
             isCreatingButton = false;
         });
     }
-
-    function createButton(dplnUrl, isDirectLink = false) {
-        console.log(`🚀 createButton called with URL: ${dplnUrl} (isDirectLink: ${isDirectLink})`);
-        
-        // Prevent multiple button creation attempts
-        if (isCreatingButton) {
-            console.log("⏸️ Button creation already in progress, skipping");
-            return;
-        }
-        
-        // Check current popup visibility state before creating button
-        browserAPI.storage.sync.get(['popupVisible'], function(result) {
-            const isVisible = result.popupVisible === true;
-            
-            if (!isVisible) {
-                console.log("❌ Extension disabled, not creating button");
-                console.log("🔓 Button creation lock released (disabled)");
-                isCreatingButton = false;
-                return;
-            }
-            
-            isCreatingButton = true;
-            console.log("🔒 Button creation lock engaged");
-            
-            const existingBtn = document.getElementById("dofus-quest-linker-btn");
-            if (existingBtn) existingBtn.remove();
-            
-            // Create container with correct original styling
-            const container = document.createElement("div");
-            container.id = "dpln-button-main";
-        container.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 999999;
-            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 50%, #6b3e20 100%);
-            border: 2px solid #d4af37;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2);
-            cursor: pointer;
-            font-family: 'Trebuchet MS', Arial, sans-serif;
-            transition: all 0.3s ease;
-            max-width: 240px;
-        `;
-        
-        // Create logo and text container
-        const content = document.createElement("div");
-        content.style.cssText = `
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        `;
-            
-        // Add logo
-            const logo = document.createElement("img");
-        logo.src = browserAPI.runtime.getURL("dofusquestimg.png");
-            logo.alt = "DofusPourLesNoobs";
-        logo.style.cssText = `
-            width: 52px;
-            height: 52px;
-            border-radius: 4px;
-        `;
-            
-        // Add text
-        const text = document.createElement("div");
-        
-        // Create title element
-        const title = document.createElement("div");
-        title.style.cssText = "color: #d4af37; font-size: 11px; font-weight: bold; margin-bottom: 2px;";
-        title.textContent = "DOFUS POUR LES NOOBS";
-        
-        // Create subtitle element
-        const subtitle = document.createElement("div");
-        subtitle.style.cssText = "color: #ffffff; font-size: 12px; opacity: 0.9;";
-        subtitle.textContent = isDirectLink ? 'Try Direct Link' : 'Open Guide';
-            
-        // Append elements
-        text.appendChild(title);
-        text.appendChild(subtitle);
-        
-        content.appendChild(logo);
-        content.appendChild(text);
-        container.appendChild(content);
-        
-        // Hover effects
-            container.onmouseover = () => {
-            container.style.transform = 'translateY(-2px)';
-            container.style.boxShadow = '0 6px 16px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.4)';
-            container.style.borderColor = '#ffd700';
-            };
-            
-            container.onmouseout = () => {
-            container.style.transform = 'translateY(0)';
-            container.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4), 0 0 20px rgba(212,175,55,0.2)';
-            container.style.borderColor = '#d4af37';
-            };
-            
-            // Add click handler
-            container.onclick = () => {
-                console.log(`🔗 BUTTON CLICKED! Opening URL: ${dplnUrl}`);
-                window.open(dplnUrl, "_blank");
-            };
-            
-            // Add to page
-            document.body.appendChild(container);
-            console.log("Styled button created for URL:", dplnUrl);
-            console.log("🔓 Button creation lock released");
-            isCreatingButton = false;
-        });
-    }
-
-        
-    // Remove existing buttons before creating new ones
-    function removeExistingButtons() {
-        const existingButtons = document.querySelectorAll('[id^="dpln-button-"], #dofus-quest-linker-btn');
-        console.log(`🧹 Removing ${existingButtons.length} existing buttons:`, existingButtons);
-        existingButtons.forEach(button => button.remove());
-    }
-
 
     function createFallbackButton() {
         // Enhanced approach: Try API first, then generate direct URLs for missing content
@@ -898,26 +1050,7 @@
                     // If this was the last content type to check and nothing was found
                     if (completedChecks === contentTypes.length && !foundFrenchName) {
                         console.log(`🚫 No French version found in API for: ${englishName}`);
-                        console.log(`� Generating direct URLs using pattern-based approach`);
-                        
-                        // Generate likely French names using patterns
-                        const likelyFrenchNames = generateLikelyFrenchNames(englishName);
-                        console.log(`🔍 Trying ${likelyFrenchNames.length} pattern-based French names`);
-                        
-                        // Universal approach: Create buttons for any non-English pattern matches
-                        const highConfidenceMatch = likelyFrenchNames.find(name => 
-                            name !== englishName && // Not the original English name
-                            name.length > 3 // Skip very short patterns
-                        );
-                        
-                        if (highConfidenceMatch) {
-                            const urlVariants = generateUrlVariants(highConfidenceMatch);
-                            console.log(`🎯 High-confidence fallback URLs`);
-                            createButtonWithFallback(urlVariants);
-                        } else {
-                            console.log(`🚫 No high-confidence pattern match for: ${englishName}`);
-                            console.log(`💡 Skipping button creation to avoid broken URLs`);
-                        }
+                        console.log(`💡 Skipping button creation - no valid URL available`);
                     }
                 })
                 .catch(error => {
@@ -930,23 +1063,4 @@
         });
     }
     
-    // Pattern-based French name generation without hardcoded translations
-    function generateLikelyFrenchNames(englishName) {
-        const frenchNames = [];
-        
-                
-                
-        // Universal approach: Only use original English name as fallback
-        // No hardcoded exceptions - rely on API and universal patterns
-        
-        // Add original as final fallback
-        if (!frenchNames.includes(englishName)) {
-            frenchNames.push(englishName);
-        }
-        
-        return frenchNames;
-    }
-    
-    // Universal URL generation system - no hardcoded test cases needed
-    
-    })();
+})();
